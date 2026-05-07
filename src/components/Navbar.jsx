@@ -17,15 +17,21 @@ export default function Navbar() {
           Home
         </Link>
 
+        {/* Note: I kept your href="/movies" as you had it, 
+            but you might want to change this to "/contact" later! */}
         <Link href="/movies" className="hover:text-red-400">
           Contact us
         </Link>
       </div>
 
-      {/* Profile Button (RIGHT SIDE) */}
-      <button className="ml-auto px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-all duration-300">
-        Profile
-      </button>
+      {/* Profile Button (RIGHT SIDE) - Now Wrapped in Link */}
+      <div className="ml-auto">
+        <Link href="/booking">
+          <button className="px-6 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-all duration-300 active:scale-95">
+            Profile
+          </button>
+        </Link>
+      </div>
 
     </nav>
   )
