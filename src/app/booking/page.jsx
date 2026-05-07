@@ -6,8 +6,8 @@ import Link from 'next/link'
 export default function BookingDashboard() {
   // Mock state - this would eventually come from your database (e.g., Neon Postgres)
   const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@university.edu",
+    name: "Roshan Pushpakumara",
+    email: "john.push@university.edu",
     memberSince: "March 2026",
     bookings: [
       { id: 1, movie: "Avatar 3", time: "18:30", date: "May 10", seats: "A12, A13" },

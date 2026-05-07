@@ -24,7 +24,7 @@ export default function MovieCard({ movie }) {
       <p className="text-zinc-400 mb-6">{movie.genre}</p>
 
       <Link href={`/movie/${movie.id}`} className="w-full">
-        <button className="w-full py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-all duration-300">
+        <button className="w-full py-3 rounded-full bg-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-all duration-300">
           Book Seat
         </button>
       </Link>
