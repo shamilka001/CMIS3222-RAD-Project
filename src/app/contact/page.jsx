@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Navbar from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export default function ContactPage() {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function ContactPage() {
 
   return (
     <div className="bg-black min-h-screen relative overflow-hidden">
+      <Navbar />
       
       {/* --- PERSISTENT VIDEO BACKGROUND --- */}
       <div className="fixed inset-0 z-0">
@@ -41,23 +44,14 @@ export default function ContactPage() {
       </div>
 
       {/* --- CONTENT LAYER --- */}
-      <motion.main 
+      <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
         className="min-h-screen text-white relative z-10 flex flex-col items-center pt-32 pb-20 lg:pt-40 p-6"
       >
-        <nav className="absolute top-0 w-full p-8 flex justify-between items-center">
-          <button 
-            onClick={() => router.push("/")}
-            className="group flex items-center gap-2 text-[10px] tracking-[0.4em] font-black uppercase text-white/40 hover:text-cyan-500 transition-colors outline-none"
-          >
-            <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Home
-          </button>
-        </nav>
-
-        <div className="w-full max-w-6xl">
-          <motion.div 
+        <div className="w-full max-w-6xl mt-10">
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -72,32 +66,32 @@ export default function ContactPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div className="flex flex-col justify-start space-y-10">
+            <div className="flex flex-col justify-start space-y-10 text-left">
               <div>
                 <h2 className="text-cyan-500 font-bold tracking-[0.3em] text-xs uppercase mb-4">Inquiry Portal</h2>
                 <h1 className="text-6xl lg:text-8xl font-black tracking-tighter leading-[0.85] mb-8 uppercase">
                   Let's <br /> <span className="text-white/20">Connect.</span>
                 </h1>
                 <div className="space-y-8 mt-12">
-                    <div className="flex items-center gap-6 group cursor-default">
-                      <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl transition-all group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10">✉️</div>
-                      <div>
-                          <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Email Us</p>
-                          <p className="font-bold text-lg">mora@maxlite.com</p>
-                      </div>
+                  <div className="flex items-center gap-6 group cursor-default">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl transition-all group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10">✉️</div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Email Us</p>
+                      <p className="font-bold text-lg">mora@maxlite.com</p>
                     </div>
-                    <div className="flex items-center gap-6 group cursor-default">
-                      <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl transition-all group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10">📍</div>
-                      <div>
-                          <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">HQ Location</p>
-                          <p className="font-bold text-lg italic">University Innovation Hub</p>
-                      </div>
+                  </div>
+                  <div className="flex items-center gap-6 group cursor-default">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl transition-all group-hover:border-cyan-500/50 group-hover:bg-cyan-500/10">📍</div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">HQ Location</p>
+                      <p className="font-bold text-lg italic">University Innovation Hub</p>
                     </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-14 shadow-2xl relative self-start">
+            <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 lg:p-14 shadow-2xl relative self-start text-left">
               {status === "success" ? (
                 <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center space-y-6 animate-in fade-in zoom-in duration-500">
                   <div className="w-24 h-24 bg-cyan-500 rounded-full flex items-center justify-center text-black text-4xl shadow-[0_0_50px_rgba(6,182,212,0.4)]">✓</div>
@@ -139,6 +133,7 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </motion.main>
     </div>
   );

@@ -1,8 +1,9 @@
 "use client"
-
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 
 export default function Navdok({ onContactClick, onHomeClick }) {
+  const router = useRouter();
   return (
     <nav className="md:hidden bg-black/30 px-4 py-6 flex justify-center rounded-full shadow-lg backdrop-blur-md border border-white/20 backdrop-contrast-150 backdrop-brightness-80">
       
@@ -30,8 +31,15 @@ export default function Navdok({ onContactClick, onHomeClick }) {
           />
         </button>
 
+        {/* About Trigger */}
+        <button onClick={() => router.push("/about")} title="About Us" className="outline-none">
+          <div className="w-[28px] h-[28px] rounded-full border-2 border-white/40 flex items-center justify-center text-[10px] font-black text-white/70 hover:border-white hover:text-white transition-all">
+            i
+          </div>
+        </button>
+
         {/* Account / Booking */}
-        <button title="My Bookings" className="outline-none">
+        <button onClick={() => router.push('/profile')} title="My Bookings" className="outline-none">
           <Image
             src="/icons/prf.png"
             alt="Account"

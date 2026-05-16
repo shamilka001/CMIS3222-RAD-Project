@@ -15,9 +15,10 @@ const DynamicHeroParallax = dynamic(() => import('../components/Hero').then(mod 
 
 // Swiper components
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Autoplay } from "swiper/modules";
+import { EffectCoverflow, Autoplay, FreeMode } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
+import "swiper/css/free-mode";
 
 export default function UnifiedCinemaPage() {
   const [view, setView] = useState("home"); // "home", "transitioning", "contact", "login"
@@ -25,36 +26,37 @@ export default function UnifiedCinemaPage() {
   const [loading, setLoading] = useState(true);
   const videoRef = useRef(null);
 
-  // FETCH LIVE DATA FROM NEON DB DIRECTLY ON MOUNT
+  // FETCH LIVE DATA FROM BACKEND DIRECTLY ON MOUNT
   useEffect(() => {
     async function loadMovies() {
       try {
-        const res = await fetch("/api/movies", { cache: "no-store" });
-        const dbMovies = await res.json();
+        const res = await fetch("http://localhost:5000/film/get-all-film", { cache: "no-store" });
+        const responseData = await res.json();
         
-        // Cleaned up the broken duplicate syntax blocks here
-        if (dbMovies && dbMovies.length > 0) {
-          const formatted = dbMovies.map(movie => ({
-            id: movie.id,
-            title: movie.title,
+        if (responseData && responseData.data && responseData.data.length > 0) {
+          const formatted = responseData.data.map(movie => ({
+            id: movie.film_id,
+            title: movie.film_name,
             genre: movie.genre,
-            // Uses the database string path directly since you confirmed it already contains /images/posters/
-            poster: movie.posterUrl || "/images/posters/fallback.jpg", 
-            rating: movie.rating || "0.0"
+            poster: movie.poster_image || "/images/posters/fallback.jpg", 
+            rating: "8.5", // Mocking rating as it's not in the new schema yet
+            producer: "MaxLite Studios", 
+            runtime: `${movie.duration} min`
           }));
           setRecommendedMovies(formatted);
         } else {
-          throw new Error("No movies found in database");
+          throw new Error("No movies found in backend");
         }
       } catch (error) {
-        console.warn("⚠️ Neon DB data unavailable, running fallback local arrays pointing to public/images/posters/:", error);
+        console.warn("⚠️ Backend film data unavailable, running fallback local arrays:", error);
         
-        // Local fallback array strictly configured to read your public/images/posters/ directory files
         setRecommendedMovies([
-          { id: 1, title: "Dune 2", genre: "Sci-Fi", poster: "/images/posters/dune.png", rating: "8.8" },
-          { id: 2, title: "Deadpool 3", genre: "Action", poster: "/images/posters/deadpool.jpg", rating: "8.5" },
-          { id: 3, title: "The Martian", genre: "Sci-Fi", poster: "/images/posters/martian.jpg", rating: "8.2" },
-          { id: 4, title: "Mario Bros", genre: "Animation", poster: "/images/posters/mario.jpg", rating: "7.8" }
+          { id: 1, title: "John Wick 4", genre: "Action", poster: "/images/posters/wick.jpg", rating: "8.8", producer: "Lionsgate", runtime: "169 min" },
+          { id: 2, title: "Super Mario", genre: "Animation", poster: "/images/posters/mari.jpg", rating: "8.5", producer: "Nintendo", runtime: "92 min" },
+          { id: 3, title: "Interstellar", genre: "Sci-Fi", poster: "/images/posters/ints.jpg", rating: "9.2", producer: "Syncopy", runtime: "169 min" },
+          { id: 4, title: "Baba Yaga", genre: "Action", poster: "/images/posters/wick.jpg", rating: "8.2", producer: "Lionsgate", runtime: "120 min" },
+          { id: 5, title: "Mario Kart", genre: "Animation", poster: "/images/posters/mari.jpg", rating: "7.8", producer: "Nintendo", runtime: "95 min" },
+          { id: 6, title: "Space Odyssey", genre: "Sci-Fi", poster: "/images/posters/ints.jpg", rating: "9.5", producer: "Warner Bros", runtime: "142 min" }
         ]);
       } finally {
         setLoading(false);
@@ -64,11 +66,18 @@ export default function UnifiedCinemaPage() {
     loadMovies();
   }, []);
 
-  const triggerContactTransition = () => {
+  const triggerContactTransition = async () => {
     if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-      setView("transitioning");
+      try {
+        videoRef.current.currentTime = 0;
+        await videoRef.current.play();
+        setView("transitioning");
+      } catch (error) {
+        console.warn("Video playback failed, jumping to contact:", error);
+        setView("contact");
+      }
+    } else {
+      setView("contact");
     }
   };
 
@@ -101,15 +110,17 @@ export default function UnifiedCinemaPage() {
       <div className="fixed inset-0 z-0 bg-black">
         <video
           ref={videoRef}
-          src="/animations/contact.mp4"
           muted
           playsInline
+          preload="auto"
           onEnded={handleVideoEnded}
           className={`w-full h-full object-cover transition-all duration-[1000ms] ease-in-out ${
             view === "home" ? "opacity-30 scale-105 blur-sm" : 
             view === "login" ? "opacity-20 blur-xl scale-110" : "opacity-40 scale-100 blur-0"
           }`}
-        />
+        >
+          <source src="/animations/contact.mp4" type="video/mp4" />
+        </video>
         <div className={`absolute inset-0 bg-black transition-opacity duration-1000 ${view === "home" ? 'opacity-70' : 'opacity-20'}`} />
       </div>
 
@@ -124,43 +135,33 @@ export default function UnifiedCinemaPage() {
             className="relative z-10"
           >
             <section className="px-6 md:px-10 pt-32 pb-16">
-              <DynamicHeroParallax />
+              <DynamicHeroParallax 
+                detailsTitle="Precision Sound Meets Unreal Depth"
+                detailsDesc="Step into a world where every pixel is perfect and every sound is felt. MaxLite brings the future of entertainment to Moratuwa."
+              />
             </section>
 
-            <section className="px-10 pb-20">
+            <motion.section 
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="px-10 pb-20"
+            >
               {loading ? (
                 <div className="text-center py-20 font-black tracking-widest text-zinc-500 animate-pulse">
                   LOADING CINEMA FILMS...
                 </div>
               ) : (
-                <Swiper
-                  modules={[EffectCoverflow, Autoplay]}
-                  effect="coverflow"
-                  centeredSlides={true}
-                  slidesPerView={"auto"}
-                  loop={true} 
-                  loopPreventsSliding={false} 
-                  autoplay={{
-                    delay: 3000,
-                    disableOnInteraction: false,
-                  }}
-                  coverflowEffect={{
-                    rotate: 10,
-                    stretch: 0,
-                    depth: 150,
-                    modifier: 1,
-                    slideShadows: false,
-                  }}
-                  className="py-12"
-                >
-                  {recommendedMovies.map((movie) => (
-                    <SwiperSlide key={movie.id} className="max-w-[350px]">
+                <div className="flex flex-wrap justify-center gap-8 py-12">
+                  {recommendedMovies.slice(0, 5).map((movie) => (
+                    <div key={movie.id} className="w-full max-w-[320px]">
                       <MovieCard movie={movie} />
-                    </SwiperSlide>
+                    </div>
                   ))}
-                </Swiper>
+                </div>
               )}
-            </section>
+            </motion.section>
             <Footer />
           </motion.div>
         )}
