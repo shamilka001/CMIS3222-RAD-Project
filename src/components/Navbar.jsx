@@ -1,62 +1,68 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import Link from 'next/link'
+import React, { useState } from 'react';
 
-export default function Navbar() {
-  // STATIC TOGGLE: Change this to 'true' to see the Profile button, 
-  // or 'false' to see the Login button.
+export default function Navbar({ onContactClick, onHomeClick, onLoginClick }) {
+  // This state can stay here for UI testing, but eventually, 
+  // you'll likely lift this to a global context.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const handleLoginClick = () => {
+    // If we aren't logged in, show the login view
+    if (!isLoggedIn) {
+      onLoginClick();
+    }
+  };
+
   return (
-    <nav className="bg-black/30 text-amber-50 px-6 py-4 flex items-center rounded-full shadow-lg backdrop-blur-xs border border-white/20 backdrop-saturate-150">
+    <nav className="hidden md:flex fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-7xl bg-black/30 text-white px-8 py-4 items-center rounded-full shadow-2xl backdrop-blur-md border border-white/10">
 
       {/* Logo */}
-      <div className="text-2xl font-bold flex items-center gap-2">
-        <img src="/icons/logo.png" alt="CinemaHub" className="h-10 w-10" />
+      <div className="flex items-center gap-2 cursor-pointer" onClick={onHomeClick}>
+        <img src="/icons/logo.png" alt="MaxLight" className="h-8 w-8" />
+        <span className="font-black italic uppercase tracking-tighter text-xl">MaxLight</span>
       </div>
 
       {/* Navigation Links */}
-      <div className="flex gap-16 text-lg mx-auto pl-24">
-        <Link href="/" className="hover:text-red-400 transition-colors">
+      <div className="flex gap-12 mx-auto">
+        <button 
+          onClick={onHomeClick}
+          className="text-xs font-black uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors outline-none"
+        >
           Home
-        </Link>
-        <Link href="/contact" className="hover:text-red-400 transition-colors">
-          Contact us
-        </Link>
+        </button>
+        
+        <button 
+          onClick={onContactClick}
+          className="text-xs font-black uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors outline-none"
+        >
+          Contact
+        </button>
       </div>
 
-      {/* Action Buttons (RIGHT SIDE) */}
-      <div className="ml-auto flex items-center gap-4">
-        
-        {/* CONDITIONAL RENDERING LOGIC */}
+      {/* Action Buttons */}
+      <div className="flex items-center gap-4">
         {!isLoggedIn ? (
-          // 1. Shown only when NOT logged in
-          <Link href="/login">
-            <button className="px-5 py-2 rounded-full border border-white/30 hover:bg-white/10 hover:border-white transition-all text-sm font-medium">
-              Login
-            </button>
-          </Link>
+          <button 
+            onClick={handleLoginClick}
+            className="px-6 py-2 rounded-full border border-white/20 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all text-[10px] font-black uppercase tracking-widest"
+          >
+            Login
+          </button>
         ) : (
-          // 2. Shown only when LOGGED in
           <div className="flex items-center gap-4">
-            <Link href="/booking">
-              <button className="px-6 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-105 transition-all duration-300 active:scale-95">
-                Profile
-              </button>
-            </Link>
-            
-            {/* Optional: Logout button to test the toggle */}
+            <button className="px-6 py-2 rounded-full bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-105 transition-all">
+              Profile
+            </button>
             <button 
-              onClick={() => setIsLoggedIn(false)}
-              className="text-xs text-white/40 hover:text-white transition-colors"
+              onClick={() => setIsLoggedIn(false)} 
+              className="text-[9px] font-bold text-white/20 hover:text-white transition-colors uppercase tracking-tighter"
             >
               Logout
             </button>
           </div>
         )}
-        
       </div>
     </nav>
-  )
+  );
 }

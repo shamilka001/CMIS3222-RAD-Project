@@ -1,17 +1,15 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
 
-export default function Navbar() {
+export default function Navdok({ onContactClick, onHomeClick }) {
   return (
-    <nav className="bg-black/30 px-4 py-8 flex justify-center rounded-full shadow-lg backdrop-blur-md border border-white/20 backdrop-contrast-150 backdrop-brightness-80">
+    <nav className="md:hidden bg-black/30 px-4 py-6 flex justify-center rounded-full shadow-lg backdrop-blur-md border border-white/20 backdrop-contrast-150 backdrop-brightness-80">
       
-      {/* Inner container controls spacing */}
       <div className="flex items-center justify-between w-full max-w-md px-6 gap-8">
 
-        {/* Home */}
-        <Link href="/" title="Home">
+        {/* Home Trigger */}
+        <button onClick={onHomeClick} title="Home" className="outline-none">
           <Image
             src="/icons/hom.png"
             alt="Home"
@@ -19,21 +17,21 @@ export default function Navbar() {
             height={28}
             className="hover:scale-110 transition opacity-70 hover:opacity-100"
           />
-        </Link>
+        </button>
 
-        {/* Contact Us - Now connected to /contact */}
-        <Link href="/contact" title="Contact Us">
+        {/* Contact Trigger (Cinematic Transition) */}
+        <button onClick={onContactClick} title="Contact Us" className="outline-none">
           <Image
-            src="/icons/com.png" // This is your contact icon
+            src="/icons/com.png"
             alt="Contact"
             width={28}
             height={28}
             className="hover:scale-110 transition opacity-70 hover:opacity-100"
           />
-        </Link>
+        </button>
 
-        {/* Booking / Account */}
-        <Link href="/booking" title="My Bookings">
+        {/* Account / Booking */}
+        <button title="My Bookings" className="outline-none">
           <Image
             src="/icons/prf.png"
             alt="Account"
@@ -41,7 +39,7 @@ export default function Navbar() {
             height={28}
             className="hover:scale-110 transition opacity-70 hover:opacity-100"
           />
-        </Link>
+        </button>
 
       </div>
     </nav>

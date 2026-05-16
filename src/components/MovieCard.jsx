@@ -6,8 +6,11 @@ export default function MovieCard({ movie }) {
   const router = useRouter();
 
   const handleQuickBook = () => {
-    // This forces the app to jump straight to the cinematic booking state
-    router.push(`/movie/${movie.id}?mode=cinematic`);
+    /** * This links the card to your John Wick detail page.
+     * We REMOVED the ?mode=cinematic here so the user sees 
+     * the beautiful detail page first.
+     */
+    router.push(`/movie/${movie.id}`);
   };
 
   return (
@@ -16,7 +19,8 @@ export default function MovieCard({ movie }) {
       <img
         src={movie.poster}
         alt={movie.title}
-        className="w-full aspect-[2/3] object-cover rounded-[1.5rem] mb-4"
+        className="w-full aspect-[2/3] object-cover rounded-[1.5rem] mb-4 cursor-pointer"
+        onClick={() => router.push(`/movie/${movie.id}`)}
         onError={(e) => {
           e.target.src = "https://via.placeholder.com/300x450/1a1a1a/ffffff?text=No+Poster";
         }}
@@ -25,10 +29,9 @@ export default function MovieCard({ movie }) {
       <h2 className="text-xl font-bold text-white text-center">{movie.title}</h2>
       <p className="text-zinc-400 mb-6">{movie.genre}</p>
 
-      {/* Button instead of Link to trigger the specific cinematic route */}
       <button 
         onClick={handleQuickBook}
-        className="w-full py-3 rounded-full bg-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:bg-blue-500 transition-all"
+        className="w-full py-3 rounded-full bg-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:bg-blue-500 transition-all active:scale-95"
       >
         Book Now
       </button>
