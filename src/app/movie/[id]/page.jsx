@@ -18,6 +18,32 @@ function MovieDetailContent() {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Review states
+  const [reviews, setReviews] = useState([]);
+  const [fetchingReviews, setFetchingReviews] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [newRating, setNewRating] = useState(5);
+  const [newDescription, setNewDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState("");
+
+  const fetchReviews = async () => {
+    if (!movieId) return;
+    try {
+      setFetchingReviews(true);
+      const res = await fetch(`http://localhost:5000/review/${movieId}`, { cache: "no-store" });
+      const responseData = await res.json();
+      if (responseData && responseData.data) {
+        setReviews(responseData.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch reviews:", err);
+    } finally {
+      setFetchingReviews(false);
+    }
+  };
+
   useEffect(() => {
     async function getMovieDetail() {
       try {
@@ -55,8 +81,80 @@ function MovieDetailContent() {
       }
     }
 
-    if (movieId) getMovieDetail();
+    if (movieId) {
+      getMovieDetail();
+      fetchReviews();
+    }
+
+    // Decode token to find active session
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setCurrentUser(payload);
+      } catch (e) {
+        console.error("Failed to parse token payload", e);
+      }
+    }
   }, [movieId]);
+
+  // Compute dynamic average rating from review data
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
+    : null;
+
+  const handlePostReview = async (e) => {
+    e.preventDefault();
+    setReviewError("");
+    setReviewSuccess("");
+
+    if (!newDescription.trim()) {
+      setReviewError("Please type in a description for your review.");
+      return;
+    }
+
+    if (!currentUser || !currentUser.id) {
+      setReviewError("Session not recognized. Please log in again.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const response = await fetch("http://localhost:5000/review/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          filmId: movieId,
+          description: newDescription,
+          rating: newRating,
+        }),
+      });
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned invalid non-JSON output.");
+      }
+
+      const resData = await response.json();
+
+      if (response.ok) {
+        setReviewSuccess("Review submitted successfully!");
+        setNewDescription("");
+        setNewRating(5);
+        fetchReviews(); // Dynamic reload
+      } else {
+        setReviewError(resData.message || "Failed to submit review.");
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      setReviewError("Could not connect to backend server.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleGoToCinematic = () => {
     router.push(`/movie/${movieId}?mode=cinematic`);
@@ -108,10 +206,12 @@ function MovieDetailContent() {
             <span className="uppercase text-sm tracking-widest text-cyan-500 font-bold">
               {movie.genre}
             </span>
-            {movie.rating && (
+            {(avgRating || movie.rating) && (
               <>
                 <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full" />
-                <span className="text-sm font-bold text-amber-400">★ {movie.rating}</span>
+                <span className="text-sm font-bold text-amber-400">
+                  ★ {avgRating ? `${avgRating} (${reviews.length} ${reviews.length === 1 ? "review" : "reviews"})` : movie.rating}
+                </span>
               </>
             )}
           </motion.div>
@@ -157,41 +257,106 @@ function MovieDetailContent() {
           </h2>
 
           {/* Add Review Form */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] mb-12">
-            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6">Write a review</h3>
-            <div className="flex gap-2 mb-6">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button key={star} className="text-2xl text-zinc-700 hover:text-amber-400 transition-colors">★</button>
-              ))}
+          {!currentUser ? (
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[2.5rem] mb-12 text-center">
+              <div className="text-3xl mb-4">💬</div>
+              <h3 className="text-lg font-black uppercase italic mb-2">Want to share your thoughts?</h3>
+              <p className="text-xs text-zinc-400 uppercase tracking-widest mb-6">Log in to write a review and rate this movie</p>
+              <Link 
+                href="/login"
+                className="inline-block bg-cyan-500 text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-white hover:text-black transition-all shadow-lg shadow-cyan-500/40"
+              >
+                Log In to Review
+              </Link>
             </div>
-            <textarea 
-              placeholder="Share your thoughts about the film..."
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 outline-none focus:border-cyan-500 transition-all min-h-[120px] mb-6"
-            />
-            <button className="bg-white text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-cyan-500 transition-all">
-              Post Review
-            </button>
-          </div>
+          ) : (
+            <form onSubmit={handlePostReview} className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] mb-12">
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6">Write a review</h3>
+              
+              {reviewError && (
+                <div className="mb-4 text-xs font-bold text-red-500 uppercase tracking-wider bg-red-500/10 border border-red-500/20 p-4 rounded-2xl">
+                  {reviewError}
+                </div>
+              )}
+              {reviewSuccess && (
+                <div className="mb-4 text-xs font-bold text-green-500 uppercase tracking-wider bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
+                  {reviewSuccess}
+                </div>
+              )}
+
+              <div className="flex gap-2 mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button 
+                    key={star} 
+                    type="button"
+                    onClick={() => setNewRating(star)}
+                    disabled={submitting}
+                    className={`text-2xl transition-colors ${
+                      star <= newRating ? "text-amber-400" : "text-zinc-700 hover:text-amber-400"
+                    }`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              <textarea 
+                placeholder="Share your thoughts about the film..."
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                disabled={submitting}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 outline-none focus:border-cyan-500 transition-all min-h-[120px] mb-6 text-white placeholder:text-zinc-500"
+              />
+              <button 
+                type="submit"
+                disabled={submitting}
+                className="bg-white text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-cyan-500 transition-all disabled:opacity-50"
+              >
+                {submitting ? "Posting..." : "Post Review"}
+              </button>
+            </form>
+          )}
 
           {/* Review List */}
           <div className="space-y-6">
-            {[
-              { name: "Nimansith Dinu", date: "2 days ago", rating: 5, text: "Absolutely breathtaking! The visuals and the score are on another level." },
-              { name: "Shamilka Peiris", date: "1 week ago", rating: 4, text: "A cinematic masterpiece. Long but definitely worth the watch." }
-            ].map((review, i) => (
-              <div key={i} className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="font-black uppercase text-sm tracking-tight">{review.name}</p>
-                    <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1">{review.date}</p>
-                  </div>
-                  <div className="flex text-amber-400 text-xs">
-                    {"★".repeat(review.rating)}
-                  </div>
-                </div>
-                <p className="text-zinc-400 leading-relaxed">{review.text}</p>
+            {fetchingReviews ? (
+              <div className="text-center py-10 text-zinc-500 font-bold uppercase tracking-widest animate-pulse">
+                Fetching audience opinions...
               </div>
-            ))}
+            ) : reviews.length === 0 ? (
+              <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 text-center text-zinc-500">
+                <p className="text-xs font-black uppercase tracking-widest mb-1">No reviews yet</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-600">Be the first to share your thoughts on this film!</p>
+              </div>
+            ) : (
+              reviews.map((review) => {
+                const displayName = review.first_name || review.last_name 
+                  ? `${review.first_name || ""} ${review.last_name || ""}`.trim()
+                  : review.email || "Anonymous User";
+                const dateText = review.created_at 
+                  ? new Date(review.created_at).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    })
+                  : "Recent Review";
+
+                return (
+                  <div key={review.review_id} className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.03] hover:border-white/10 transition-all">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="font-black uppercase text-sm tracking-tight">{displayName}</p>
+                        <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1">{dateText}</p>
+                      </div>
+                      <div className="flex text-amber-400 text-xs">
+                        {"★".repeat(review.rating)}
+                        {"☆".repeat(5 - review.rating)}
+                      </div>
+                    </div>
+                    <p className="text-zinc-400 leading-relaxed text-sm whitespace-pre-wrap">{review.description}</p>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
       </div>
