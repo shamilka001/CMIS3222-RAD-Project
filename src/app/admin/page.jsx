@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import Sidebar from "../../components/Sidebar"
 import { motion, AnimatePresence } from "framer-motion"
-import { Users, Settings, Plus, Trash2, Edit2, Shield, X, Search } from "lucide-react"
+import { Users, Settings, Plus, Trash2, Edit2, Shield, X, Search, Ticket, Calendar, TrendingUp, CheckCircle2, Clock, AlertTriangle, UserCheck, UserX } from "lucide-react"
+import { authFetch } from "../../lib/api"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -21,6 +22,12 @@ export default function AdminDashboard() {
   const [usersSubTab, setUsersSubTab] = useState('guests') // 'guests' or 'staff'
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Bookings & Showtimes States
+  const [allBookings, setAllBookings] = useState([])
+  const [showtimes, setShowtimes] = useState([])
+  const [loadingBookings, setLoadingBookings] = useState(false)
+  const [bookingsSearchQuery, setBookingsSearchQuery] = useState('')
+
   // Staff Form & Modal States
   const [showStaffModal, setShowStaffModal] = useState(null) // 'create', 'edit', or null
   const [selectedStaff, setSelectedStaff] = useState(null)
@@ -37,13 +44,65 @@ export default function AdminDashboard() {
   const [staffFormSubmitting, setStaffFormSubmitting] = useState(false)
 
   const stats = [
-    { label: "Total Bookings", value: "1,284", growth: "+12%" },
-    { label: "Active Movies", value: movies.length > 0 ? movies.length.toString() : "24", growth: "Stable" },
-    { label: "Revenue", value: "$12,450", growth: "+8%" },
-    { label: "New Users", value: "142", growth: "+18%" }
+    { label: "Total Bookings", value: allBookings.length > 0 ? allBookings.length.toString() : "0", growth: allBookings.length > 0 ? "Live" : "Stable" },
+    { label: "Active Movies", value: movies.length > 0 ? movies.length.toString() : "0", growth: "Stable" },
+    { label: "Revenue", value: allBookings.length > 0 ? `$${(allBookings.reduce((sum, b) => sum + (b.total_seats * 12), 0)).toLocaleString()}` : "$0", growth: "Live" },
+    { label: "Total Users", value: allUsers.length > 0 ? allUsers.length.toString() : "0", growth: "Live" }
   ]
 
-  // Fetch all movies from backend on mount
+  const activeGuestsCount = allUsers.filter(u => u.role !== 'STAFF' && u.status === 'ACTIVE').length;
+  const suspendedGuestsCount = allUsers.filter(u => u.role !== 'STAFF' && u.status === 'SUSPENDED').length;
+  const activeStaffCount = allUsers.filter(u => u.role === 'STAFF' && u.status === 'ACTIVE').length;
+  const suspendedStaffCount = allUsers.filter(u => u.role === 'STAFF' && u.status === 'SUSPENDED').length;
+
+  const usersChartData = [
+    { label: "Active Guests", count: activeGuestsCount, gradient: "from-cyan-500 to-blue-600", icon: UserCheck, color: "text-cyan-500" },
+    { label: "Suspended Guests", count: suspendedGuestsCount, gradient: "from-amber-500 to-red-600", icon: UserX, color: "text-amber-500" },
+    { label: "Active Staff", count: activeStaffCount, gradient: "from-emerald-500 to-teal-600", icon: Shield, color: "text-emerald-500" },
+    { label: "Suspended Staff", count: suspendedStaffCount, gradient: "from-purple-500 to-pink-600", icon: AlertTriangle, color: "text-purple-400" }
+  ];
+
+  const maxUsersVal = Math.max(...usersChartData.map(d => d.count), 1);
+
+  const loadBookingsAndShowtimes = async () => {
+    try {
+      setLoadingBookings(true);
+      const [bookingsRes, showtimesRes] = await Promise.all([
+        authFetch("http://localhost:5000/booking", { cache: "no-store" }),
+        fetch("http://localhost:5000/showtime", { cache: "no-store" })
+      ]);
+      const bookingsJson = await bookingsRes.json();
+      const showtimesJson = await showtimesRes.json();
+      if (bookingsJson && bookingsJson.data) {
+        setAllBookings(bookingsJson.data);
+      }
+      if (showtimesJson && showtimesJson.data) {
+        setShowtimes(showtimesJson.data);
+      }
+    } catch (err) {
+      console.error("Failed to load bookings and showtimes in admin:", err);
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
+
+  // Fetch all users/staff from backend
+  const loadUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const res = await authFetch("http://localhost:5000/user", { cache: "no-store" });
+      const responseData = await res.json();
+      if (responseData && responseData.data) {
+        setAllUsers(responseData.data);
+      }
+    } catch (err) {
+      console.error("Failed to load users in admin:", err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  // Initial mount load
   useEffect(() => {
     async function loadMovies() {
       try {
@@ -60,29 +119,23 @@ export default function AdminDashboard() {
       }
     }
     loadMovies();
+    loadUsers();
+    loadBookingsAndShowtimes();
   }, []);
-
-  // Fetch all users/staff from backend on mount and tab switch
-  const loadUsers = async () => {
-    try {
-      setLoadingUsers(true);
-      const res = await fetch("http://localhost:5000/user", { cache: "no-store" });
-      const responseData = await res.json();
-      if (responseData && responseData.data) {
-        setAllUsers(responseData.data);
-      }
-    } catch (err) {
-      console.error("Failed to load users in admin:", err);
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
 
   useEffect(() => {
     if (activeTab === 'users') {
       loadUsers();
     }
+    if (activeTab === 'bookings') {
+      loadBookingsAndShowtimes();
+    }
   }, [activeTab]);
+
+  const getMovieForBooking = (booking) => {
+    const showtime = showtimes.find(s => s.showtime_id === booking.showtime_id);
+    return showtime ? showtime.film_name : "Unknown Film";
+  };
 
   const handleExpandMovie = async (filmId) => {
     if (expandedMovieId === filmId) {
@@ -121,7 +174,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/user/register', {
+      const res = await authFetch('http://localhost:5000/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -160,7 +213,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/user/${selectedStaff.user_id}`, {
+      const res = await authFetch(`http://localhost:5000/user/${selectedStaff.user_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -190,7 +243,7 @@ export default function AdminDashboard() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/user/${userId}`, {
+      const res = await authFetch(`http://localhost:5000/user/${userId}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -245,7 +298,15 @@ export default function AdminDashboard() {
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-4xl font-black uppercase italic tracking-tighter">
-              {activeTab === 'overview' ? 'System Overview' : activeTab === 'movies' ? 'Movie Catalog & Reviews' : activeTab === 'users' ? 'User Directory' : activeTab}
+              {activeTab === 'overview' 
+                ? 'System Overview' 
+                : activeTab === 'movies' 
+                ? 'Movie Catalog & Reviews' 
+                : activeTab === 'users' 
+                ? 'User Directory' 
+                : activeTab === 'bookings'
+                ? 'Cinema Bookings'
+                : activeTab}
             </h1>
             <p className="text-white/40 text-sm uppercase tracking-[0.2em]">Dashboard / {activeTab}</p>
           </div>
@@ -289,16 +350,38 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {[1, 2, 3, 4].map((i) => (
-                    <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
-                      <td className="py-6 px-4 font-bold text-white/80">User_0{i}@gmail.com</td>
-                      <td className="py-6 px-4 text-white/60">Dune: Part Two</td>
-                      <td className="py-6 px-4 font-mono text-cyan-500">A1, A2</td>
-                      <td className="py-6 px-4">
-                        <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-[10px] font-black uppercase">Confirmed</span>
+                  {allBookings.length > 0 ? (
+                    allBookings.slice(0, 5).map((booking) => {
+                      const movieName = getMovieForBooking(booking);
+                      const userDisplayName = booking.first_name || booking.last_name
+                        ? `${booking.first_name || ''} ${booking.last_name || ''}`.trim()
+                        : booking.email || "Guest";
+                      return (
+                        <tr key={booking.booking_id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                          <td className="py-6 px-4 font-bold text-white/80">{userDisplayName}</td>
+                          <td className="py-6 px-4 text-white/60">{movieName}</td>
+                          <td className="py-6 px-4 font-mono text-cyan-500">{booking.seats ? booking.seats.join(', ') : 'N/A'}</td>
+                          <td className="py-6 px-4">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                              booking.status === 'CONFIRMED' || booking.status === 'ACTIVE'
+                                ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                : booking.status === 'PENDING'
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            }`}>
+                              {booking.status || 'PENDING'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="py-12 text-center text-zinc-500 font-bold uppercase tracking-widest">
+                        No recent bookings found.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -450,6 +533,90 @@ export default function AdminDashboard() {
         {/* USERS TAB CONTENT */}
         {activeTab === 'users' && (
           <div className="space-y-8 animate-in fade-in duration-300">
+            {/* USER METRICS BAR CHART */}
+            <div className="bg-white/[0.02] border border-white/10 rounded-[3rem] p-8 flex flex-col lg:flex-row gap-8 backdrop-blur-md">
+              {/* Vertical Bar Chart */}
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 className="text-lg font-black uppercase italic tracking-tight">System Account Metrics</h3>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Guest vs Staff active status distribution</p>
+                  </div>
+                </div>
+
+                <div className="h-48 flex items-end gap-6 px-4 border-b border-white/10 pb-2 relative">
+                  {/* Grid Lines */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-white/5" />
+                  <div className="absolute inset-x-0 top-[25%] h-px bg-white/5" />
+                  <div className="absolute inset-x-0 top-[50%] h-px bg-white/5" />
+                  <div className="absolute inset-x-0 top-[75%] h-px bg-white/5" />
+
+                  {usersChartData.map((data, index) => {
+                    const percentage = (data.count / maxUsersVal) * 100;
+                    return (
+                      <div key={data.label} className="flex-1 flex flex-col items-center h-full justify-end relative group">
+                        {/* Bar */}
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${percentage}%` }}
+                          transition={{ type: "spring", stiffness: 60, delay: index * 0.1 }}
+                          className={`w-12 sm:w-16 bg-gradient-to-t ${data.gradient} rounded-t-xl relative flex items-start justify-center cursor-pointer`}
+                        >
+                          {/* Tooltip on hover */}
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-black border border-white/20 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg transition-opacity pointer-events-none shadow-xl z-20 whitespace-nowrap">
+                            {data.count} accounts
+                          </div>
+                        </motion.div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* X Axis Labels */}
+                <div className="flex gap-6 px-4 mt-3 text-center">
+                  {usersChartData.map((data) => (
+                    <div key={data.label} className="flex-1 text-[9px] uppercase tracking-wider font-black text-white/40">
+                      {data.label.split(' ')[0]} <span className="block text-[8px] text-white/20 font-bold">{data.label.split(' ')[1]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stats Summary Panel */}
+              <div className="w-full lg:w-80 bg-white/[0.01] border border-white/5 rounded-[2rem] p-6 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-4">Database Summary</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-white/5">
+                      <span className="text-xs text-white/50 font-bold uppercase tracking-wider">Total Guests</span>
+                      <span className="text-sm font-black text-white">{activeGuestsCount + suspendedGuestsCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/5">
+                      <span className="text-xs text-white/50 font-bold uppercase tracking-wider">Total Staff</span>
+                      <span className="text-sm font-black text-white">{activeStaffCount + suspendedStaffCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/5">
+                      <span className="text-xs text-white/50 font-bold uppercase tracking-wider">Active Status Rate</span>
+                      <span className="text-sm font-black text-green-400">
+                        {allUsers.length > 0 
+                          ? `${Math.round(((activeGuestsCount + activeStaffCount) / allUsers.length) * 100)}%` 
+                          : "0%"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-500">
+                    <TrendingUp size={16} />
+                  </div>
+                  <span className="text-[9px] uppercase tracking-widest font-black text-white/40 leading-normal">
+                    {allUsers.length} total registered profiles monitored
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white/[0.02] border border-white/10 rounded-[3rem] p-10 backdrop-blur-md">
               
               {/* HEADER AREA */}
@@ -612,6 +779,195 @@ export default function AdminDashboard() {
               )}
 
             </div>
+          </div>
+        )}
+
+        {/* BOOKINGS TAB CONTENT */}
+        {activeTab === 'bookings' && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {/* BOOKINGS METRICS */}
+            {(() => {
+              const totalBookingsCount = allBookings.length;
+              const pendingBookingsCount = allBookings.filter(b => b.status === 'PENDING').length;
+              const confirmedBookingsCount = allBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'ACTIVE').length;
+              const otherBookingsCount = totalBookingsCount - pendingBookingsCount - confirmedBookingsCount;
+
+              const filteredBookings = allBookings.filter(b => {
+                if (!bookingsSearchQuery) return true;
+                const query = bookingsSearchQuery.toLowerCase();
+                const movieName = getMovieForBooking(b).toLowerCase();
+                const customerName = `${b.first_name || ''} ${b.last_name || ''}`.toLowerCase();
+                const email = (b.email || '').toLowerCase();
+                const seats = (b.seats || []).join(', ').toLowerCase();
+                const status = (b.status || '').toLowerCase();
+                
+                return movieName.includes(query) || 
+                       customerName.includes(query) || 
+                       email.includes(query) || 
+                       seats.includes(query) || 
+                       status.includes(query);
+              });
+
+              return (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-md">
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-black mb-1">Total Bookings</p>
+                      <h3 className="text-3xl font-black text-white">{totalBookingsCount}</h3>
+                      <span className="text-[10px] text-cyan-500 font-bold">All processed orders</span>
+                    </div>
+                    <div className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-md">
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-black mb-1">Confirmed</p>
+                      <h3 className="text-3xl font-black text-green-400">{confirmedBookingsCount}</h3>
+                      <span className="text-[10px] text-zinc-500 font-bold">Ready for show</span>
+                    </div>
+                    <div className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-md">
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-black mb-1">Pending Approval</p>
+                      <h3 className="text-3xl font-black text-amber-400">{pendingBookingsCount}</h3>
+                      <span className="text-[10px] text-zinc-500 font-bold">Needs confirmation</span>
+                    </div>
+                    <div className="p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 backdrop-blur-md">
+                      <p className="text-[10px] uppercase tracking-widest text-white/30 font-black mb-1">Cancelled / Other</p>
+                      <h3 className="text-3xl font-black text-red-400">{otherBookingsCount}</h3>
+                      <span className="text-[10px] text-zinc-500 font-bold">Void or failed</span>
+                    </div>
+                  </div>
+
+                  {/* BOOKINGS LIST */}
+                  <div className="bg-white/[0.02] border border-white/10 rounded-[3rem] p-10 backdrop-blur-md">
+                    {/* HEADER AREA */}
+                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8">
+                      <div>
+                        <h3 className="text-xl font-black uppercase italic">Cinema Bookings</h3>
+                        <p className="text-white/40 text-xs uppercase tracking-widest mt-1">Monitor bookings, active seats, and customer contact info</p>
+                      </div>
+                      
+                      {/* SEARCH BAR */}
+                      <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+                        <input 
+                          type="text"
+                          placeholder="Search bookings..."
+                          value={bookingsSearchQuery}
+                          onChange={(e) => setBookingsSearchQuery(e.target.value)}
+                          className="bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-3 text-xs w-80 focus:outline-none focus:border-cyan-500 transition-all placeholder:text-white/20"
+                        />
+                      </div>
+                    </div>
+
+                    {/* LISTINGS PANEL */}
+                    {loadingBookings ? (
+                      <div className="text-center py-20 text-zinc-500 font-bold uppercase tracking-[0.3em] animate-pulse">
+                        Querying Bookings Database...
+                      </div>
+                    ) : filteredBookings.length === 0 ? (
+                      <div className="text-center py-20 text-zinc-500 font-bold uppercase tracking-widest bg-white/[0.01] border border-white/5 rounded-2xl">
+                        No bookings matching the filters.
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-white/20 text-[10px] uppercase tracking-[0.3em] border-b border-white/5">
+                              <th className="pb-6 px-4">Customer</th>
+                              <th className="pb-6 px-4">Movie Details</th>
+                              <th className="pb-6 px-4">Showtime</th>
+                              <th className="pb-6 px-4">Seats</th>
+                              <th className="pb-6 px-4">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-sm">
+                            {filteredBookings.map((booking) => {
+                              const movieTitle = getMovieForBooking(booking);
+                              const customerName = booking.first_name || booking.last_name
+                                ? `${booking.first_name || ''} ${booking.last_name || ''}`.trim()
+                                : "No Name";
+                              const showtimeInfo = showtimes.find(s => s.showtime_id === booking.showtime_id);
+                              
+                              let dateString = "N/A";
+                              if (showtimeInfo && showtimeInfo.show_date) {
+                                dateString = new Date(showtimeInfo.show_date).toLocaleDateString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric"
+                                });
+                              }
+                              
+                              const timeString = showtimeInfo 
+                                ? `${showtimeInfo.start_time?.slice(0, 5)} - ${showtimeInfo.end_time?.slice(0, 5)}`
+                                : `${booking.start_time?.slice(0, 5)} - ${booking.end_time?.slice(0, 5)}`;
+                                
+                              return (
+                                <tr key={booking.booking_id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors group">
+                                  {/* Customer Column */}
+                                  <td className="py-6 px-4">
+                                    <div className="flex items-center gap-4">
+                                      <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 flex items-center justify-center font-black uppercase text-sm">
+                                        {customerName.charAt(0)}
+                                      </div>
+                                      <div>
+                                        <span className="font-bold text-white/85 block">{customerName}</span>
+                                        <span className="text-[9px] text-white/30 lowercase font-mono block mt-0.5">{booking.email}</span>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  {/* Movie Details Column */}
+                                  <td className="py-6 px-4">
+                                    <div>
+                                      <span className="font-bold text-white/80 block uppercase italic tracking-tight">{movieTitle}</span>
+                                      <span className="text-[9px] text-white/30 uppercase font-black tracking-wider block mt-0.5">
+                                        {showtimeInfo?.screen_name || "Standard Screen"}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  {/* Showtime Column */}
+                                  <td className="py-6 px-4">
+                                    <div>
+                                      <span className="font-bold text-white/80 block">{dateString}</span>
+                                      <span className="text-[9px] text-cyan-500/80 font-mono block mt-0.5">{timeString}</span>
+                                    </div>
+                                  </td>
+                                  {/* Seats Column */}
+                                  <td className="py-6 px-4">
+                                    <div className="flex flex-wrap gap-1.5 max-w-[150px]">
+                                      {booking.seats && booking.seats.map((seat) => (
+                                        <span key={seat} className="px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[10px] text-cyan-400 font-bold">
+                                          {seat}
+                                        </span>
+                                      ))}
+                                      {!booking.seats && <span className="text-white/30 text-xs font-medium">—</span>}
+                                    </div>
+                                  </td>
+                                  {/* Status Column */}
+                                  <td className="py-6 px-4">
+                                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase ${
+                                      booking.status === 'CONFIRMED' || booking.status === 'ACTIVE'
+                                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                                        : booking.status === 'PENDING'
+                                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                        : "bg-red-500/10 text-red-400 border border-red-500/20"
+                                    }`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${
+                                        booking.status === 'CONFIRMED' || booking.status === 'ACTIVE'
+                                          ? 'bg-green-400 animate-pulse'
+                                          : booking.status === 'PENDING'
+                                          ? 'bg-amber-400 animate-pulse'
+                                          : 'bg-red-400'
+                                      }`} />
+                                      {booking.status || 'PENDING'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
 
