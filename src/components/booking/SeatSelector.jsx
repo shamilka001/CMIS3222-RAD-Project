@@ -1,224 +1,3 @@
-// // "use client"
-
-// // import { useState } from "react"
-
-// // export default function SeatSelector({ seatCount }) {
-// //   const [selectedSeats, setSelectedSeats] = useState([])
-// //   const seats = Array.from({ length: 60 }, (_, i) => i + 1)
-
-// //   function toggleSeat(seat) {
-// //     if (selectedSeats.includes(seat)) {
-// //       setSelectedSeats(selectedSeats.filter(s => s !== seat))
-// //     } else if (selectedSeats.length < seatCount) {
-// //       setSelectedSeats([...selectedSeats, seat])
-// //     }
-// //   }
-
-// //   const isComplete = selectedSeats.length === seatCount
-
-// //   return (
-// //     <div className="flex flex-col items-center">
-// //       <div className="w-full max-w-xl mb-12">
-// //         <div className="w-full h-1 bg-cyan-500 rounded-full shadow-[0_0_20px_rgba(6,182,212,1)]" />
-// //         <p className="text-center text-[10px] tracking-[0.5em] text-white/30 uppercase mt-4">Screen</p>
-// //       </div>
-
-// //       <div className="grid grid-cols-10 gap-3 mb-10">
-// //         {seats.map(seat => {
-// //           const isSelected = selectedSeats.includes(seat)
-// //           const isDisabled = !isSelected && selectedSeats.length >= seatCount
-// //           return (
-// //             <button
-// //               key={seat}
-// //               onClick={() => toggleSeat(seat)}
-// //               disabled={isDisabled}
-// //               className={`w-10 h-10 rounded-t-xl text-[10px] font-bold transition-all ${
-// //                 isSelected
-// //                   ? "bg-cyan-500 text-black border-t-2 border-white"
-// //                   : isDisabled
-// //                   ? "bg-white/5 text-white/10"
-// //                   : "bg-white/10 text-white/40 border-t-2 border-white/10 hover:bg-white/20"
-// //               }`}
-// //             >
-// //               {seat}
-// //             </button>
-// //           )
-// //         })}
-// //       </div>
-
-// //       <div className="w-full flex items-center justify-between p-8 bg-black/60 backdrop-blur-xl rounded-[40px] border border-white/10">
-// //         <div className="flex flex-col">
-// //           <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest">Seats</span>
-// //           <span className="text-xl font-black text-white">{selectedSeats.length > 0 ? selectedSeats.sort((a,b)=>a-b).join(", ") : "—"}</span>
-// //         </div>
-// //         <button
-// //           disabled={!isComplete}
-// //           className={`px-10 py-4 rounded-2xl font-black transition-all ${
-// //             isComplete ? "bg-white text-black hover:bg-cyan-500" : "bg-white/10 text-white/20"
-// //           }`}
-// //         >
-// //           {isComplete ? "PROCEED TO PAYMENT" : `SELECT ${seatCount - selectedSeats.length} MORE`}
-// //         </button>
-// //       </div>
-// //     </div>
-// //   )
-// // }
-
-// "use client";
-
-// import { useState, useEffect } from "react";
-
-// export default function SeatSelector({ seatCount, showtimeId = "SHOW001" }) {
-//   const [seatsData, setSeatsData] = useState([]);
-//   const [selectedSeats, setSelectedSeats] = useState([]); // Stores full seat objects
-//   const [loading, setLoading] = useState(true);
-
-//   // Fetch seats data from backend
-//   useEffect(() => {
-//     async function fetchSeats() {
-//       try {
-//         const response = await fetch("http://localhost:5000/seat/");
-//         const result = await response.json();
-//         if (result && result.data) {
-//           setSeatsData(result.data);
-//         }
-//       } catch (error) {
-//         console.error("Error fetching seats:", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-//     fetchSeats();
-//   }, []);
-
-//   function toggleSeat(seatObj) {
-//     const isAlreadySelected = selectedSeats.some(
-//       (s) => s.seat_id === seatObj.seat_id,
-//     );
-
-//     if (isAlreadySelected) {
-//       setSelectedSeats(
-//         selectedSeats.filter((s) => s.seat_id !== seatObj.seat_id),
-//       );
-//     } else if (selectedSeats.length < seatCount) {
-//       setSelectedSeats([...selectedSeats, seatObj]);
-//     }
-//   }
-
-//   // Handle Booking submission
-//   async function handleProceedToPayment() {
-//     const token = localStorage.getItem("token"); // Get token from local storage
-
-//     // Construct the formatting the backend expects: e.g., "A1", "B5"
-//     const formattedSeatLabels = selectedSeats.map(
-//       (s) => `${s.row_label}${s.seat_number}`,
-//     );
-
-//     const payload = {
-//       userId: "1250cfad-735d-4f91-8144-0a1ca8b3590e", // Replace dynamically if needed
-//       showtimeId: showtimeId,
-//       seats: formattedSeatLabels,
-//     };
-
-//     try {
-//       const response = await fetch("http://localhost:5000/booking/", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: token ? `Bearer ${token}` : "", // Attach token if available
-//         },
-//         body: JSON.stringify(payload),
-//       });
-
-//       const result = await response.json();
-//       if (response.ok) {
-//         alert(`Booking created successfully! ID: ${result.data.bookingId}`);
-//         // Route to payment page or reset state here
-//       } else {
-//         alert(`Booking failed: ${result.message || "Unknown error"}`);
-//       }
-//     } catch (error) {
-//       console.error("Error creating booking:", error);
-//       alert("An error occurred while processing your booking.");
-//     }
-//   }
-
-//   const isComplete = selectedSeats.length === seatCount;
-
-//   if (loading) {
-//     return (
-//       <div className="text-white text-center p-10">Loading seat layout...</div>
-//     );
-//   }
-
-//   return (
-//     <div className="flex flex-col items-center">
-//       <div className="w-full max-w-xl mb-12">
-//         <div className="w-full h-1 bg-cyan-500 rounded-full shadow-[0_0_20px_rgba(6,182,212,1)]" />
-//         <p className="text-center text-[10px] tracking-[0.5em] text-white/30 uppercase mt-4">
-//           Screen
-//         </p>
-//       </div>
-
-//       <div className="grid grid-cols-10 gap-3 mb-10">
-//         {seatsData.map((seat) => {
-//           const isSelected = selectedSeats.some(
-//             (s) => s.seat_id === seat.seat_id,
-//           );
-//           const isDisabled = !isSelected && selectedSeats.length >= seatCount;
-
-//           return (
-//             <button
-//               key={seat.seat_id}
-//               onClick={() => toggleSeat(seat)}
-//               disabled={isDisabled}
-//               className={`w-10 h-10 rounded-t-xl text-[10px] font-bold transition-all ${
-//                 isSelected
-//                   ? "bg-cyan-500 text-black border-t-2 border-white"
-//                   : isDisabled
-//                     ? "bg-white/5 text-white/10"
-//                     : "bg-white/10 text-white/40 border-t-2 border-white/10 hover:bg-white/20"
-//               }`}
-//             >
-//               {seat.row_label}
-//               {seat.seat_number}
-//             </button>
-//           );
-//         })}
-//       </div>
-
-//       <div className="w-full flex items-center justify-between p-8 bg-black/60 backdrop-blur-xl rounded-[40px] border border-white/10">
-//         <div className="flex flex-col">
-//           <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest">
-//             Seats
-//           </span>
-//           <span className="text-xl font-black text-white">
-//             {selectedSeats.length > 0
-//               ? selectedSeats
-//                   .map((s) => `${s.row_label}${s.seat_number}`)
-//                   .sort()
-//                   .join(", ")
-//               : "—"}
-//           </span>
-//         </div>
-//         <button
-//           disabled={!isComplete}
-//           onClick={handleProceedToPayment}
-//           className={`px-10 py-4 rounded-2xl font-black transition-all ${
-//             isComplete
-//               ? "bg-white text-black hover:bg-cyan-500"
-//               : "bg-white/10 text-white/20"
-//           }`}
-//         >
-//           {isComplete
-//             ? "PROCEED TO PAYMENT"
-//             : `SELECT ${seatCount - selectedSeats.length} MORE`}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -339,12 +118,33 @@ export default function SeatSelector({
     }
 
     const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Authentication token missing. Please log in again.");
+      return;
+    }
+
+    // Dynamic extraction of user_id from the stored JWT token
+    let currentUserId;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      currentUserId = payload.id; // Extracts the real user ID mapping matching your profile configuration
+    } catch (e) {
+      console.error("Token decoding fault handled:", e);
+      alert("Your session token is malformed. Please log in again.");
+      return;
+    }
+
+    if (!currentUserId) {
+      alert("Invalid session profile tracking setup. Please sign in.");
+      return;
+    }
+
     const formattedSeatLabels = selectedSeats.map(
       (s) => `${s.row_label}${s.seat_number}`,
     );
 
     const payload = {
-      userId: "1250cfad-735d-4f91-8144-0a1ca8b3590e",
+      userId: currentUserId, // Dynamic active authenticated user context pointer
       showtimeId: String(showtimeId),
       seats: formattedSeatLabels,
     };
@@ -354,7 +154,7 @@ export default function SeatSelector({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -366,7 +166,6 @@ export default function SeatSelector({
         setBookedSeats((prev) => [...prev, ...formattedSeatLabels]);
         setSelectedSeats([]);
       } else if (response.status === 409) {
-        // Intercepted race condition! Inform user, clear selected state, and trigger a fresh canvas sync
         alert(`Reservation Intercepted: ${result.message}`);
 
         const refreshResponse = await fetch(
