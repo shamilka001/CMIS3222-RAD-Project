@@ -1,12 +1,13 @@
 "use client"
 
-import { Home, Users, Film, BarChart3, Settings, LogOut } from "lucide-react"
+import { Home, Users, Film, BarChart3, Settings, LogOut, Ticket } from "lucide-react"
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'movies', label: 'Movies', icon: Film },
     { id: 'users', label: 'Users', icon: Users },
+    { id: 'bookings', label: 'Bookings', icon: Ticket },
     { id: 'settings', label: 'Settings', icon: Settings },
   ]
 
