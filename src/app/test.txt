@@ -1,0 +1,19 @@
+const swiper = new Swiper('.swiper', {
+  slidesPerGroupAuto: true,
+  slidesOffsetBefore: 70,
+  slidesOffsetAfter: 70,
+  centeredSlides: true,
+  roundLengths: true,
+  parallax: true,
+  effect: "coverflow",
+  coverflowEffect: {
+    depth: 150
+  },
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev"
+  },
+  pagination: {
+    el: ".swiper-pagination"
+  }
+});
