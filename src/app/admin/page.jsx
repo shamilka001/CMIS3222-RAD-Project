@@ -37,7 +37,11 @@ export default function AdminDashboard() {
         </main>
 
         {/* Live Active Feed Sidebar */}
+<<<<<<< HEAD
         {/* {visibleComponents.aside && <ActivityAside />} */}
+=======
+        {visibleComponents.aside && <ActivityAside />}
+>>>>>>> 9312dcf23d11b17d8eb34806bf4c765cf47f5b43
 
       </div>
     </div>

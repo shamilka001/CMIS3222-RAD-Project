@@ -22,7 +22,15 @@ export default function Header({ activeTab }) {
             className="bg-input border border-border text-xs rounded-xl pl-9 pr-4 py-2 w-48 focus:outline-none focus:ring-1 focus:ring-brand-lime focus:border-brand-lime transition-all text-foreground placeholder:text-muted-foreground/50 font-medium"
           />
         </div>
+<<<<<<< HEAD
       
+=======
+        
+        {/* Profile / Admin Identity Node */}
+        <div className="h-8 w-8 rounded-xl bg-brand-lime text-black font-black flex items-center justify-center text-xs shadow-sm">
+          AD
+        </div>
+>>>>>>> 9312dcf23d11b17d8eb34806bf4c765cf47f5b43
       </div>
     </header>
   )
