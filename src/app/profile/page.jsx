@@ -34,7 +34,7 @@ export default function ProfilePage() {
         if (!userId) throw new Error("token_missing_id");
 
         // 1. Fetch User Profile Details
-        const userRes = await authFetch(`http://localhost:5000/user/${userId}`);
+        const userRes = await authFetch(`http://localhost:5000/user/get-by-id/${userId}`);
         const contentType = userRes.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("server_error_not_json");
@@ -42,21 +42,26 @@ export default function ProfilePage() {
 
         const responseData = await userRes.json();
 
-        if (userRes.ok && responseData.data) {
+        if (userRes.ok && responseData && responseData.data) {
           const userData = responseData.data;
           setUser({
-            firstName: userData.first_name,
-            lastName: userData.last_name,
-            email: userData.email,
-            phoneNumber: userData.phone_number,
-            status: userData.status,
+            firstName: userData.first_name || "",
+            lastName: userData.last_name || "",
+            email: userData.email || "",
+            phoneNumber: userData.phone_number || "",
+            status: userData.status || "Active",
             id: userData.user_id,
           });
         } else {
-          throw new Error(responseData.message || "Failed to load profile");
+          // FIXED: Safeguard string parameter extraction to prevent runtime call stack crash
+          const fallbackMsg =
+            responseData?.message ||
+            responseData?.error ||
+            "Failed to load profile configuration metrics.";
+          throw new Error(fallbackMsg);
         }
 
-        // 2. Fetch User Purchased Booking History using your dedicated REST endpoint pattern
+        // 2. Fetch User Purchased Booking History
         const bookingRes = await authFetch(
           `http://localhost:5000/user/booking/${userId}`,
         );
@@ -78,8 +83,9 @@ export default function ProfilePage() {
           }
         }
       } catch (err) {
-        console.error("Profile fetch error:", err);
+        console.error("Profile fetch error caught cleanly:", err);
 
+        // Map errors safely to state to display to the user without crashing the engine
         if (
           err.message === "token_malformed" ||
           err.message === "token_missing_id"
@@ -89,15 +95,10 @@ export default function ProfilePage() {
           router.push("/login");
         } else if (err.message === "server_error_not_json") {
           setError(
-            "The server returned an invalid response. Please contact support.",
+            "The server returned an invalid response format. Please contact engineering support.",
           );
         } else {
-          setError("Unable to load account data. Please try again.");
-        }
-
-        if (err.message.includes("401") || err.message.includes("403")) {
-          localStorage.removeItem("token");
-          router.push("/login");
+          setError(err.message || "Unable to load account dataset metrics.");
         }
       } finally {
         setLoading(false);
@@ -170,14 +171,18 @@ export default function ProfilePage() {
                     Full Name
                   </label>
                   <p className="text-xl font-black uppercase italic">
-                    {user?.firstName} {user?.lastName}
+                    {user?.firstName || user?.lastName
+                      ? `${user?.firstName} ${user?.lastName}`
+                      : "Unnamed Operator"}
                   </p>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
                     Email Address
                   </label>
-                  <p className="text-lg font-bold truncate">{user?.email}</p>
+                  <p className="text-lg font-bold truncate">
+                    {user?.email || "Missing Dataset Entry"}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
@@ -203,7 +208,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Main History Display Area (Scrollable Files Layout) */}
+          {/* Right Main History Display Area */}
           <div className="lg:col-span-8">
             <div className="bg-zinc-950/50 border border-zinc-800/50 p-8 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
               <div className="flex items-center justify-between mb-8">
@@ -229,20 +234,18 @@ export default function ProfilePage() {
                   </button>
                 </div>
               ) : (
-                /* Y-Axis Scrollable View Container */
                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                   {bookings.map((booking) => (
                     <div
-                      key={booking.id}
+                      key={booking.id || Math.random().toString()}
                       className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-all backdrop-blur-md"
                     >
                       <div className="flex items-center gap-6">
-                        {/* Movie Thumbnail Placeholder Box */}
                         <div className="w-16 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden flex-shrink-0">
                           {booking.moviePoster ? (
                             <img
                               src={booking.moviePoster}
-                              alt={booking.movieTitle}
+                              alt={booking.movieTitle || "Movie Poster"}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -250,24 +253,27 @@ export default function ProfilePage() {
                           )}
                         </div>
 
-                        {/* Ticket File Breakdown Data Details */}
                         <div>
                           <p className="text-lg font-black uppercase italic group-hover:text-cyan-500 transition-colors line-clamp-1">
-                            {booking.movieTitle}
+                            {booking.movieTitle || "Unknown Feature Title"}
                           </p>
                           <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1">
-                            📅 {booking.date} • 🕒 {booking.time.split(".")[0]}
+                            {/* FIXED: Added a structural check on string split evaluations to avoid type crash errors */}
+                            📅 {booking.date || "TBD"} • 🕒{" "}
+                            {booking.time
+                              ? booking.time.split(".")[0]
+                              : "00:00"}
                           </p>
                           <p className="text-[9px] text-cyan-500/70 font-black uppercase tracking-wider mt-1">
-                            🏛️ {booking.theaterName || "Standard Screen"}
+                            Building:{" "}
+                            {booking.theaterName || "Standard Hall Complex"}
                           </p>
                           <p className="text-[8px] text-zinc-600 font-mono tracking-tighter mt-1 truncate max-w-[250px]">
-                            ID: {booking.id}
+                            ID: {booking.id || "N/A"}
                           </p>
                         </div>
                       </div>
 
-                      {/* Seat Map Configurations Metadata Position */}
                       <div className="text-left sm:text-right flex sm:flex-col justify-between items-center sm:items-end gap-2 border-t border-white/5 sm:border-none pt-4 sm:pt-0">
                         <div>
                           <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest block sm:mb-1">
@@ -288,7 +294,7 @@ export default function ProfilePage() {
                               : "bg-zinc-800 text-zinc-400"
                           }`}
                         >
-                          {booking.status}
+                          {booking.status || "UNKNOWN"}
                         </span>
                       </div>
                     </div>

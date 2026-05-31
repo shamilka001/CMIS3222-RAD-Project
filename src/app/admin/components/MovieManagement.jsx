@@ -1,11 +1,23 @@
-// "use client"
+// "use client";
 
-// import { useState } from "react"
+// import { useState } from "react";
 // import {
-//   Film, Calendar, Plus, Edit2, Trash2, X,
-//   Clock, Tag, Search, BarChart3, DollarSign,
-//   Armchair, CheckCircle2, AlertCircle, TrendingUp
-// } from "lucide-react"
+//   Film,
+//   Calendar,
+//   Plus,
+//   Edit2,
+//   Trash2,
+//   X,
+//   Clock,
+//   Tag,
+//   Search,
+//   BarChart3,
+//   DollarSign,
+//   Armchair,
+//   CheckCircle2,
+//   AlertCircle,
+//   TrendingUp,
+// } from "lucide-react";
 
 // export default function MovieManagement() {
 //   // 1. Fully Articulated Mock Data Store with Revenue and Seat Availability Matrix Arrays
@@ -17,18 +29,40 @@
 //       duration: "166 min",
 //       screenings: [
 //         {
-//           id: "scr_1", time: "05:15 PM", screen: "Screen 01", format: "IMAX 2D",
-//           ticketPrice: 15.00, totalSeats: 40,
+//           id: "scr_1",
+//           time: "05:15 PM",
+//           screen: "Screen 01",
+//           format: "IMAX 2D",
+//           ticketPrice: 15.0,
+//           totalSeats: 40,
 //           bookedSeats: ["A1", "A2", "A3", "B1", "B2", "C4", "C5", "D8"],
-//           expectedRevenue: 600.00, receivedRevenue: 120.00
+//           expectedRevenue: 600.0,
+//           receivedRevenue: 120.0,
 //         },
 //         {
-//           id: "scr_2", time: "09:30 PM", screen: "Screen 04", format: "IMAX 2D",
-//           ticketPrice: 15.00, totalSeats: 40,
-//           bookedSeats: ["A1", "A2", "B5", "B6", "C1", "C2", "C3", "D1", "D2", "D3", "D4"],
-//           expectedRevenue: 600.00, receivedRevenue: 165.00
-//         }
-//       ]
+//           id: "scr_2",
+//           time: "09:30 PM",
+//           screen: "Screen 04",
+//           format: "IMAX 2D",
+//           ticketPrice: 15.0,
+//           totalSeats: 40,
+//           bookedSeats: [
+//             "A1",
+//             "A2",
+//             "B5",
+//             "B6",
+//             "C1",
+//             "C2",
+//             "C3",
+//             "D1",
+//             "D2",
+//             "D3",
+//             "D4",
+//           ],
+//           expectedRevenue: 600.0,
+//           receivedRevenue: 165.0,
+//         },
+//       ],
 //     },
 //     {
 //       id: "mov_2",
@@ -37,84 +71,121 @@
 //       duration: "139 min",
 //       screenings: [
 //         {
-//           id: "scr_3", time: "02:00 PM", screen: "Screen 02", format: "Standard 2D",
-//           ticketPrice: 12.50, totalSeats: 40,
+//           id: "scr_3",
+//           time: "02:00 PM",
+//           screen: "Screen 02",
+//           format: "Standard 2D",
+//           ticketPrice: 12.5,
+//           totalSeats: 40,
 //           bookedSeats: ["A4", "A5", "B1", "B2", "D5"],
-//           expectedRevenue: 500.00, receivedRevenue: 62.50
-//         }
-//       ]
+//           expectedRevenue: 500.0,
+//           receivedRevenue: 62.5,
+//         },
+//       ],
 //     },
 //     {
 //       id: "mov_3",
 //       title: "Interstellar",
 //       genre: "Sci-Fi / Drama",
 //       duration: "169 min",
-//       screenings: []
-//     }
-//   ])
+//       screenings: [],
+//     },
+//   ]);
 
 //   // UI Modal Controls
-//   const [isMovieModalOpen, setIsMovieModalOpen] = useState(false)
-//   const [isScreeningModalOpen, setIsScreeningModalOpen] = useState(false)
-//   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false)
+//   const [isMovieModalOpen, setIsMovieModalOpen] = useState(false);
+//   const [isScreeningModalOpen, setIsScreeningModalOpen] = useState(false);
+//   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
 //   // Active State Target Trays
-//   const [editingMovie, setEditingMovie] = useState(null)
-//   const [activeMovieForScreening, setActiveMovieForScreening] = useState(null)
-//   const [statsMovie, setStatsMovie] = useState(null)
-//   const [statsSelectedScreening, setStatsSelectedScreening] = useState(null)
-//   const [searchQuery, setSearchQuery] = useState("")
+//   const [editingMovie, setEditingMovie] = useState(null);
+//   const [activeMovieForScreening, setActiveMovieForScreening] = useState(null);
+//   const [statsMovie, setStatsMovie] = useState(null);
+//   const [statsSelectedScreening, setStatsSelectedScreening] = useState(null);
+//   const [searchQuery, setSearchQuery] = useState("");
 
 //   // Form Field Trays
-//   const [movieForm, setMovieForm] = useState({ title: "", genre: "", duration: "" })
-//   const [screeningForm, setScreeningForm] = useState({ time: "", screen: "Screen 01", format: "Standard 2D", ticketPrice: "15.00" })
+//   const [movieForm, setMovieForm] = useState({
+//     title: "",
+//     genre: "",
+//     duration: "",
+//   });
+//   const [screeningForm, setScreeningForm] = useState({
+//     time: "",
+//     screen: "Screen 01",
+//     format: "Standard 2D",
+//     ticketPrice: "15.00",
+//   });
 
 //   // --- REVENUE CALCULATION ENGINES ---
 //   const calculateLifetimeMovieRevenue = (movie) => {
-//     if (!movie.screenings || movie.screenings.length === 0) return 0
-//     return movie.screenings.reduce((sum, scr) => sum + (scr.receivedRevenue || 0), 0)
-//   }
+//     if (!movie.screenings || movie.screenings.length === 0) return 0;
+//     return movie.screenings.reduce(
+//       (sum, scr) => sum + (scr.receivedRevenue || 0),
+//       0,
+//     );
+//   };
 
 //   // --- DATA INTERMEDIARY OPERATIONS ---
 //   const openMovieAdd = () => {
-//     setEditingMovie(null)
-//     setMovieForm({ title: "", genre: "", duration: "" })
-//     setIsMovieModalOpen(true)
-//   }
+//     setEditingMovie(null);
+//     setMovieForm({ title: "", genre: "", duration: "" });
+//     setIsMovieModalOpen(true);
+//   };
 
 //   const openMovieEdit = (movie) => {
-//     setEditingMovie(movie)
-//     setMovieForm({ title: movie.title, genre: movie.genre, duration: movie.duration })
-//     setIsMovieModalOpen(true)
-//   }
+//     setEditingMovie(movie);
+//     setMovieForm({
+//       title: movie.title,
+//       genre: movie.genre,
+//       duration: movie.duration,
+//     });
+//     setIsMovieModalOpen(true);
+//   };
 
 //   const openStatsModal = (movie) => {
-//     setStatsMovie(movie)
+//     setStatsMovie(movie);
 //     // Default select the first available screening context if it exists
-//     setStatsSelectedScreening(movie.screenings && movie.screenings.length > 0 ? movie.screenings[0] : null)
-//     setIsStatsModalOpen(true)
-//   }
+//     setStatsSelectedScreening(
+//       movie.screenings && movie.screenings.length > 0
+//         ? movie.screenings[0]
+//         : null,
+//     );
+//     setIsStatsModalOpen(true);
+//   };
 
 //   const handleMovieSubmit = (e) => {
-//     e.preventDefault()
+//     e.preventDefault();
 //     if (editingMovie) {
-//       setMovies(prev => prev.map(m => m.id === editingMovie.id ? { ...m, ...movieForm } : m))
+//       setMovies((prev) =>
+//         prev.map((m) =>
+//           m.id === editingMovie.id ? { ...m, ...movieForm } : m,
+//         ),
+//       );
 //     } else {
-//       const newMovie = { id: `mov_${Date.now()}`, ...movieForm, screenings: [] }
-//       setMovies(prev => [...prev, newMovie])
+//       const newMovie = {
+//         id: `mov_${Date.now()}`,
+//         ...movieForm,
+//         screenings: [],
+//       };
+//       setMovies((prev) => [...prev, newMovie]);
 //     }
-//     setIsMovieModalOpen(false)
-//   }
+//     setIsMovieModalOpen(false);
+//   };
 
 //   const handleMovieDelete = (movieId) => {
-//     if (confirm("Permanently wipe this feature and clear all schedules from the catalog?")) {
-//       setMovies(prev => prev.filter(m => m.id !== movieId))
+//     if (
+//       confirm(
+//         "Permanently wipe this feature and clear all schedules from the catalog?",
+//       )
+//     ) {
+//       setMovies((prev) => prev.filter((m) => m.id !== movieId));
 //     }
-//   }
+//   };
 
 //   const handleScreeningSubmit = (e) => {
-//     e.preventDefault()
-//     const price = parseFloat(screeningForm.ticketPrice) || 12.00
+//     e.preventDefault();
+//     const price = parseFloat(screeningForm.ticketPrice) || 12.0;
 //     const newScreening = {
 //       id: `scr_${Date.now()}`,
 //       time: screeningForm.time,
@@ -124,47 +195,57 @@
 //       totalSeats: 40,
 //       bookedSeats: [],
 //       expectedRevenue: price * 40,
-//       receivedRevenue: 0
-//     }
-//     setMovies(prev => prev.map(m => {
-//       if (m.id === activeMovieForScreening.id) {
-//         return { ...m, screenings: [...m.screenings, newScreening] }
-//       }
-//       return m
-//     }))
-//     setIsScreeningModalOpen(false)
-//   }
+//       receivedRevenue: 0,
+//     };
+//     setMovies((prev) =>
+//       prev.map((m) => {
+//         if (m.id === activeMovieForScreening.id) {
+//           return { ...m, screenings: [...m.screenings, newScreening] };
+//         }
+//         return m;
+//       }),
+//     );
+//     setIsScreeningModalOpen(false);
+//   };
 
 //   const handleScreeningDelete = (movieId, screeningId) => {
-//     setMovies(prev => prev.map(m => {
-//       if (m.id === movieId) {
-//         return { ...m, screenings: m.screenings.filter(s => s.id !== screeningId) }
-//       }
-//       return m
-//     }))
+//     setMovies((prev) =>
+//       prev.map((m) => {
+//         if (m.id === movieId) {
+//           return {
+//             ...m,
+//             screenings: m.screenings.filter((s) => s.id !== screeningId),
+//           };
+//         }
+//         return m;
+//       }),
+//     );
 //     // Adjust modal view sync if currently tracking active variables
 //     if (statsSelectedScreening?.id === screeningId) {
-//       setStatsSelectedScreening(null)
+//       setStatsSelectedScreening(null);
 //     }
-//   }
+//   };
 
 //   // Row generation parsing array loop
-//   const filteredMovies = movies.filter(movie =>
-//     movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//     movie.genre.toLowerCase().includes(searchQuery.toLowerCase())
-//   )
+//   const filteredMovies = movies.filter(
+//     (movie) =>
+//       movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//       movie.genre.toLowerCase().includes(searchQuery.toLowerCase()),
+//   );
 
 //   // Generate an abstract 4x10 alphanumeric cinema auditorium layout matrix grid
-//   const seatRows = ["A", "B", "C", "D"]
-//   const seatNumbers = Array.from({ length: 10 }, (_, i) => i + 1)
+//   const seatRows = ["A", "B", "C", "D"];
+//   const seatNumbers = Array.from({ length: 10 }, (_, i) => i + 1);
 
 //   return (
 //     <div className="w-full space-y-4 animate-fadeIn">
-
 //       {/* Control Configuration Filtering Matrix Row */}
 //       <div className="flex flex-col sm:flex-row gap-3 justify-between items-center bg-card border border-border rounded-2xl p-4 shadow-xs">
 //         <div className="relative w-full sm:w-80">
-//           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
+//           <Search
+//             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50"
+//             size={14}
+//           />
 //           <input
 //             type="text"
 //             placeholder="Search catalog by title or genre..."
@@ -198,14 +279,19 @@
 //             <tbody className="divide-y divide-border/60 text-xs font-medium text-foreground">
 //               {filteredMovies.length === 0 ? (
 //                 <tr>
-//                   <td colSpan="6" className="p-8 text-center text-muted-foreground/60 italic">
+//                   <td
+//                     colSpan="6"
+//                     className="p-8 text-center text-muted-foreground/60 italic"
+//                   >
 //                     No cinematic records matched your search parameters.
 //                   </td>
 //                 </tr>
 //               ) : (
 //                 filteredMovies.map((movie) => (
-//                   <tr key={movie.id} className="hover:bg-foreground/[0.01] transition-colors group">
-
+//                   <tr
+//                     key={movie.id}
+//                     className="hover:bg-foreground/[0.01] transition-colors group"
+//                   >
 //                     {/* Identity Segment */}
 //                     <td className="p-4 pl-6">
 //                       <div className="flex items-center gap-3">
@@ -216,7 +302,9 @@
 //                           <span className="font-bold text-foreground block group-hover:text-brand-lime transition-colors duration-150">
 //                             {movie.title}
 //                           </span>
-//                           <span className="text-[9px] font-mono text-muted-foreground/50 block mt-0.5">{movie.id}</span>
+//                           <span className="text-[9px] font-mono text-muted-foreground/50 block mt-0.5">
+//                             {movie.id}
+//                           </span>
 //                         </div>
 //                       </div>
 //                     </td>
@@ -230,14 +318,18 @@
 
 //                     {/* Clock Metric Node */}
 //                     <td className="p-4 text-muted-foreground font-mono">
-//                       <span className="flex items-center gap-1.5">{movie.duration}</span>
+//                       <span className="flex items-center gap-1.5">
+//                         {movie.duration}
+//                       </span>
 //                     </td>
 
 //                     {/* Screening Badging Array Fields */}
 //                     <td className="p-4">
 //                       <div className="space-y-1.5 max-w-[280px]">
 //                         {movie.screenings.length === 0 ? (
-//                           <span className="text-[10px] text-muted-foreground/40 italic block py-0.5">No showtimes live</span>
+//                           <span className="text-[10px] text-muted-foreground/40 italic block py-0.5">
+//                             No showtimes live
+//                           </span>
 //                         ) : (
 //                           <div className="flex flex-wrap gap-1">
 //                             {movie.screenings.map((scr) => (
@@ -245,11 +337,19 @@
 //                                 key={scr.id}
 //                                 className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-input border border-border rounded text-[10px] font-mono font-bold group/badge"
 //                               >
-//                                 <span className="text-foreground">{scr.time}</span>
-//                                 <span className="text-muted-foreground/30 text-[8px]">•</span>
-//                                 <span className="text-brand-lime text-[9px] font-semibold">{scr.screen.split(' ')[1]}</span>
+//                                 <span className="text-foreground">
+//                                   {scr.time}
+//                                 </span>
+//                                 <span className="text-muted-foreground/30 text-[8px]">
+//                                   •
+//                                 </span>
+//                                 <span className="text-brand-lime text-[9px] font-semibold">
+//                                   {scr.screen.split(" ")[1]}
+//                                 </span>
 //                                 <button
-//                                   onClick={() => handleScreeningDelete(movie.id, scr.id)}
+//                                   onClick={() =>
+//                                     handleScreeningDelete(movie.id, scr.id)
+//                                   }
 //                                   className="ml-1 text-muted-foreground/30 hover:text-red-400 transition-colors"
 //                                   title="Cancel Showtime"
 //                                 >
@@ -260,7 +360,16 @@
 //                           </div>
 //                         )}
 //                         <button
-//                           onClick={() => { setActiveMovieForScreening(movie); setScreeningForm({time:"", screen:"Screen 01", format:"Standard 2D", ticketPrice:"15.00"}); setIsScreeningModalOpen(true); }}
+//                           onClick={() => {
+//                             setActiveMovieForScreening(movie);
+//                             setScreeningForm({
+//                               time: "",
+//                               screen: "Screen 01",
+//                               format: "Standard 2D",
+//                               ticketPrice: "15.00",
+//                             });
+//                             setIsScreeningModalOpen(true);
+//                           }}
 //                           className="text-[10px] text-brand-lime hover:underline font-black uppercase tracking-wider block pt-0.5"
 //                         >
 //                           + Add Showtime
@@ -301,7 +410,6 @@
 //                         </button>
 //                       </div>
 //                     </td>
-
 //                   </tr>
 //                 ))
 //               )}
@@ -314,14 +422,19 @@
 //       {isStatsModalOpen && statsMovie && (
 //         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex justify-end animate-fadeIn select-none">
 //           <div className="bg-card border-l border-border w-full max-w-2xl h-full p-6 flex flex-col justify-between shadow-2xl text-foreground overflow-y-auto custom-scrollbar animate-slideLeft">
-
 //             <div>
 //               {/* Header Context Bar */}
 //               <div className="flex justify-between items-start border-b border-border pb-4 mb-6">
 //                 <div>
-//                   <span className="text-[10px] font-bold text-brand-lime uppercase tracking-widest font-mono block mb-1">Performance Insight Engine</span>
-//                   <h2 className="text-lg font-black text-foreground tracking-tight">{statsMovie.title}</h2>
-//                   <p className="text-xs text-muted-foreground mt-0.5">{statsMovie.genre} • {statsMovie.duration}</p>
+//                   <span className="text-[10px] font-bold text-brand-lime uppercase tracking-widest font-mono block mb-1">
+//                     Performance Insight Engine
+//                   </span>
+//                   <h2 className="text-lg font-black text-foreground tracking-tight">
+//                     {statsMovie.title}
+//                   </h2>
+//                   <p className="text-xs text-muted-foreground mt-0.5">
+//                     {statsMovie.genre} • {statsMovie.duration}
+//                   </p>
 //                 </div>
 //                 <button
 //                   onClick={() => setIsStatsModalOpen(false)}
@@ -334,31 +447,52 @@
 //               {/* Master Volume Box Rows */}
 //               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
 //                 <div className="bg-input border border-border/80 p-4 rounded-xl">
-//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">Gross Movie Sales</span>
+//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
+//                     Gross Movie Sales
+//                   </span>
 //                   <div className="flex items-center gap-1 mt-1 text-brand-lime font-mono text-base font-black">
 //                     <DollarSign size={16} />
-//                     <span>{calculateLifetimeMovieRevenue(statsMovie).toFixed(2)}</span>
+//                     <span>
+//                       {calculateLifetimeMovieRevenue(statsMovie).toFixed(2)}
+//                     </span>
 //                   </div>
 //                 </div>
 //                 <div className="bg-input border border-border/80 p-4 rounded-xl">
-//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">Expected Slot Value</span>
+//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
+//                     Expected Slot Value
+//                   </span>
 //                   <div className="flex items-center gap-1 mt-1 text-foreground font-mono text-base font-bold">
-//                     <DollarSign size={16} className="text-muted-foreground/40" />
-//                     <span>{statsSelectedScreening ? statsSelectedScreening.expectedRevenue.toFixed(2) : "0.00"}</span>
+//                     <DollarSign
+//                       size={16}
+//                       className="text-muted-foreground/40"
+//                     />
+//                     <span>
+//                       {statsSelectedScreening
+//                         ? statsSelectedScreening.expectedRevenue.toFixed(2)
+//                         : "0.00"}
+//                     </span>
 //                   </div>
 //                 </div>
 //                 <div className="bg-input border border-border/80 p-4 rounded-xl">
-//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">Realized Revenue</span>
+//                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
+//                     Realized Revenue
+//                   </span>
 //                   <div className="flex items-center gap-1 mt-1 text-emerald-400 font-mono text-base font-bold">
 //                     <TrendingUp size={16} className="text-emerald-500/40" />
-//                     <span>{statsSelectedScreening ? statsSelectedScreening.receivedRevenue.toFixed(2) : "0.00"}</span>
+//                     <span>
+//                       {statsSelectedScreening
+//                         ? statsSelectedScreening.receivedRevenue.toFixed(2)
+//                         : "0.00"}
+//                     </span>
 //                   </div>
 //                 </div>
 //               </div>
 
 //               {/* Step 2: Session Selection Menu Array */}
 //               <div className="space-y-2 mb-6">
-//                 <label className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">Select Active Screening Session Slot</label>
+//                 <label className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">
+//                   Select Active Screening Session Slot
+//                 </label>
 //                 {statsMovie.screenings.length === 0 ? (
 //                   <div className="p-4 bg-input border border-dashed border-border rounded-xl text-center text-xs italic text-muted-foreground/60">
 //                     No active runtime showtimes available to compile analytics.
@@ -366,7 +500,7 @@
 //                 ) : (
 //                   <div className="flex flex-wrap gap-2">
 //                     {statsMovie.screenings.map((scr) => {
-//                       const isTarget = statsSelectedScreening?.id === scr.id
+//                       const isTarget = statsSelectedScreening?.id === scr.id;
 //                       return (
 //                         <button
 //                           key={scr.id}
@@ -379,13 +513,17 @@
 //                         >
 //                           <Clock size={13} />
 //                           <div>
-//                             <span className="block font-mono leading-none">{scr.time}</span>
-//                             <span className={`text-[8px] uppercase tracking-tight block mt-0.5 font-bold ${isTarget ? "text-black/60" : "text-muted-foreground"}`}>
+//                             <span className="block font-mono leading-none">
+//                               {scr.time}
+//                             </span>
+//                             <span
+//                               className={`text-[8px] uppercase tracking-tight block mt-0.5 font-bold ${isTarget ? "text-black/60" : "text-muted-foreground"}`}
+//                             >
 //                               {scr.screen} • {scr.format}
 //                             </span>
 //                           </div>
 //                         </button>
-//                       )
+//                       );
 //                     })}
 //                   </div>
 //                 )}
@@ -396,18 +534,26 @@
 //                 <div className="border border-border bg-input/20 rounded-2xl p-5 space-y-6">
 //                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border/60">
 //                     <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-//                       <Armchair size={14} className="text-brand-lime" /> Auditorium Seat Allocation Mapping Layout
+//                       <Armchair size={14} className="text-brand-lime" />{" "}
+//                       Auditorium Seat Allocation Mapping Layout
 //                     </h4>
 
 //                     {/* Color Map Coding Index Headers */}
 //                     <div className="flex items-center gap-4 text-[10px] font-semibold text-muted-foreground font-mono">
 //                       <div className="flex items-center gap-1.5">
 //                         <span className="w-2.5 h-2.5 rounded-xs bg-foreground/[0.06] border border-border block" />
-//                         <span>Available ({statsSelectedScreening.totalSeats - statsSelectedScreening.bookedSeats.length})</span>
+//                         <span>
+//                           Available (
+//                           {statsSelectedScreening.totalSeats -
+//                             statsSelectedScreening.bookedSeats.length}
+//                           )
+//                         </span>
 //                       </div>
 //                       <div className="flex items-center gap-1.5">
 //                         <span className="w-2.5 h-2.5 rounded-xs bg-brand-lime border border-brand-lime block" />
-//                         <span>Booked ({statsSelectedScreening.bookedSeats.length})</span>
+//                         <span>
+//                           Booked ({statsSelectedScreening.bookedSeats.length})
+//                         </span>
 //                       </div>
 //                     </div>
 //                   </div>
@@ -416,7 +562,9 @@
 //                   <div className="relative w-full max-w-sm mx-auto text-center pt-2">
 //                     <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-brand-lime/40 to-transparent rounded-full blur-xs" />
 //                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent mt-0.5" />
-//                     <span className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground/40 block mt-2">Auditorium Front Screen Vector</span>
+//                     <span className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground/40 block mt-2">
+//                       Auditorium Front Screen Vector
+//                     </span>
 //                   </div>
 
 //                   {/* Alphanumeric Layout Execution Loop */}
@@ -424,12 +572,17 @@
 //                     {seatRows.map((row) => (
 //                       <div key={row} className="flex items-center gap-3">
 //                         {/* Row Tracking ID Letter label nodes */}
-//                         <span className="w-3 text-[10px] font-black font-mono text-muted-foreground/40">{row}</span>
+//                         <span className="w-3 text-[10px] font-black font-mono text-muted-foreground/40">
+//                           {row}
+//                         </span>
 
 //                         <div className="flex-1 grid grid-cols-10 gap-1.5">
 //                           {seatNumbers.map((num) => {
-//                             const seatCode = `${row}${num}`
-//                             const isBooked = statsSelectedScreening.bookedSeats.includes(seatCode)
+//                             const seatCode = `${row}${num}`;
+//                             const isBooked =
+//                               statsSelectedScreening.bookedSeats.includes(
+//                                 seatCode,
+//                               );
 //                             return (
 //                               <div
 //                                 key={seatCode}
@@ -438,11 +591,11 @@
 //                                     ? "bg-brand-lime text-black border border-brand-lime shadow-xs font-black scale-95"
 //                                     : "bg-foreground/[0.04] border border-border/80 text-muted-foreground/60 hover:border-muted-foreground/30"
 //                                 }`}
-//                                 title={`Seat Node ID: ${seatCode} [${isBooked ? 'Occupied Booking Logged' : 'Vacant Available'}]`}
+//                                 title={`Seat Node ID: ${seatCode} [${isBooked ? "Occupied Booking Logged" : "Vacant Available"}]`}
 //                               >
 //                                 {num}
 //                               </div>
-//                             )
+//                             );
 //                           })}
 //                         </div>
 //                       </div>
@@ -450,7 +603,6 @@
 //                   </div>
 //                 </div>
 //               )}
-
 //             </div>
 
 //             {/* Panel Close Actions Footer Frame */}
@@ -462,7 +614,6 @@
 //                 Close Metrics Board
 //               </button>
 //             </div>
-
 //           </div>
 //         </div>
 //       )}
@@ -473,42 +624,71 @@
 //           <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground animate-scaleUp">
 //             <div className="flex justify-between items-center mb-5">
 //               <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-//                 <Film size={16} className="text-brand-lime" /> {editingMovie ? "Modify Existing Movie" : "Register Catalog Profile"}
+//                 <Film size={16} className="text-brand-lime" />{" "}
+//                 {editingMovie
+//                   ? "Modify Existing Movie"
+//                   : "Register Catalog Profile"}
 //               </h3>
-//               <button onClick={() => setIsMovieModalOpen(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
+//               <button
+//                 onClick={() => setIsMovieModalOpen(false)}
+//                 className="text-muted-foreground hover:text-foreground"
+//               >
+//                 <X size={18} />
+//               </button>
 //             </div>
 
 //             <form onSubmit={handleMovieSubmit} className="space-y-4">
 //               <div>
-//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Film Title</label>
+//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                   Film Title
+//                 </label>
 //                 <input
-//                   type="text" required
-//                   value={movieForm.title} onChange={e => setMovieForm({...movieForm, title: e.target.value})}
+//                   type="text"
+//                   required
+//                   value={movieForm.title}
+//                   onChange={(e) =>
+//                     setMovieForm({ ...movieForm, title: e.target.value })
+//                   }
 //                   placeholder="e.g., Blade Runner 2049"
 //                   className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-semibold"
 //                 />
 //               </div>
 //               <div className="grid grid-cols-2 gap-4">
 //                 <div>
-//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Genre Array</label>
+//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                     Genre Array
+//                   </label>
 //                   <input
-//                     type="text" required
-//                     value={movieForm.genre} onChange={e => setMovieForm({...movieForm, genre: e.target.value})}
+//                     type="text"
+//                     required
+//                     value={movieForm.genre}
+//                     onChange={(e) =>
+//                       setMovieForm({ ...movieForm, genre: e.target.value })
+//                     }
 //                     placeholder="Sci-Fi / Cyberpunk"
 //                     className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-medium"
 //                   />
 //                 </div>
 //                 <div>
-//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Runtime</label>
+//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                     Runtime
+//                   </label>
 //                   <input
-//                     type="text" required
-//                     value={movieForm.duration} onChange={e => setMovieForm({...movieForm, duration: e.target.value})}
+//                     type="text"
+//                     required
+//                     value={movieForm.duration}
+//                     onChange={(e) =>
+//                       setMovieForm({ ...movieForm, duration: e.target.value })
+//                     }
 //                     placeholder="152 min"
 //                     className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-medium"
 //                   />
 //                 </div>
 //               </div>
-//               <button type="submit" className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm">
+//               <button
+//                 type="submit"
+//                 className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
+//               >
 //                 {editingMovie ? "Save Updates" : "Commit New Feature Track"}
 //               </button>
 //             </form>
@@ -522,34 +702,64 @@
 //           <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground animate-scaleUp">
 //             <div className="flex justify-between items-center mb-5">
 //               <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-//                 <Clock size={16} className="text-brand-lime" /> Program Screening Slot
+//                 <Clock size={16} className="text-brand-lime" /> Program
+//                 Screening Slot
 //               </h3>
-//               <button onClick={() => setIsScreeningModalOpen(false)} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
+//               <button
+//                 onClick={() => setIsScreeningModalOpen(false)}
+//                 className="text-muted-foreground hover:text-foreground"
+//               >
+//                 <X size={18} />
+//               </button>
 //             </div>
 //             <form onSubmit={handleScreeningSubmit} className="space-y-4">
 //               <div>
-//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Clock Time Slot</label>
+//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                   Clock Time Slot
+//                 </label>
 //                 <input
-//                   type="text" required
-//                   value={screeningForm.time} onChange={e => setScreeningForm({...screeningForm, time: e.target.value})}
+//                   type="text"
+//                   required
+//                   value={screeningForm.time}
+//                   onChange={(e) =>
+//                     setScreeningForm({ ...screeningForm, time: e.target.value })
+//                   }
 //                   placeholder="e.g., 07:15 PM"
 //                   className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono"
 //                 />
 //               </div>
 //               <div className="grid grid-cols-3 gap-2">
 //                 <div className="col-span-2">
-//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Base Price ($)</label>
+//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                     Base Price ($)
+//                   </label>
 //                   <input
-//                     type="number" step="0.01" required
-//                     value={screeningForm.ticketPrice} onChange={e => setScreeningForm({...screeningForm, ticketPrice: e.target.value})}
+//                     type="number"
+//                     step="0.01"
+//                     required
+//                     value={screeningForm.ticketPrice}
+//                     onChange={(e) =>
+//                       setScreeningForm({
+//                         ...screeningForm,
+//                         ticketPrice: e.target.value,
+//                       })
+//                     }
 //                     placeholder="15.00"
 //                     className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono"
 //                   />
 //                 </div>
 //                 <div>
-//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Projection</label>
+//                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                     Projection
+//                   </label>
 //                   <select
-//                     value={screeningForm.format} onChange={e => setScreeningForm({...screeningForm, format: e.target.value})}
+//                     value={screeningForm.format}
+//                     onChange={(e) =>
+//                       setScreeningForm({
+//                         ...screeningForm,
+//                         format: e.target.value,
+//                       })
+//                     }
 //                     className="w-full bg-input border border-border text-xs rounded-xl px-2 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
 //                   >
 //                     <option value="Standard 2D">2D</option>
@@ -559,9 +769,17 @@
 //                 </div>
 //               </div>
 //               <div>
-//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">Theater Allocation Target</label>
+//                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+//                   Theater Allocation Target
+//                 </label>
 //                 <select
-//                   value={screeningForm.screen} onChange={e => setScreeningForm({...screeningForm, screen: e.target.value})}
+//                   value={screeningForm.screen}
+//                   onChange={(e) =>
+//                     setScreeningForm({
+//                       ...screeningForm,
+//                       screen: e.target.value,
+//                     })
+//                   }
 //                   className="w-full bg-input border border-border text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
 //                 >
 //                   <option value="Screen 01">Screen 01 (40 Seats)</option>
@@ -570,628 +788,686 @@
 //                   <option value="Screen 04">Screen 04 (40 Seats)</option>
 //                 </select>
 //               </div>
-//               <button type="submit" className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm">
+//               <button
+//                 type="submit"
+//                 className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
+//               >
 //                 Deploy Showtime Track
 //               </button>
 //             </form>
 //           </div>
 //         </div>
 //       )}
-
 //     </div>
-//   )
+//   );
 // }
 
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Film,
-  Clock,
+  Calendar,
   Plus,
-  X,
   Edit2,
   Trash2,
+  X,
+  Clock,
+  Tag,
+  Search,
   BarChart3,
-  Calendar,
   Armchair,
+  CheckCircle2,
   AlertCircle,
-  Loader2,
+  Video,
+  DollarSign,
+  TrendingUp,
+  Languages,
 } from "lucide-react";
 
-export default function FilmDashboard() {
-  // Main Data States
+export default function MovieManagement() {
+  // Application Data States
   const [movies, setMovies] = useState([]);
+  const [screens, setScreens] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Sub-selection for Showtimes & Seat Matrices
-  const [activeScreenings, setActiveScreenings] = useState([]);
-  const [selectedMovieForShowtimes, setSelectedMovieForShowtimes] =
-    useState(null);
-  const [statsMovie, setStatsMovie] = useState(null);
-  const [statsSelectedScreening, setStatsSelectedScreening] = useState(null);
-  const [bookedSeatsMatrix, setBookedSeatsMatrix] = useState([]);
-  const [staticSeatsLayout, setStaticSeatsLayout] = useState([]);
-
-  // Modal Control Flags
+  // UI Modal Controls
   const [isMovieModalOpen, setIsMovieModalOpen] = useState(false);
   const [isScreeningModalOpen, setIsScreeningModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
-  const [editingMovie, setEditingMovie] = useState(null);
-  const [editingScreening, setEditingScreening] = useState(null);
 
-  // Forms Management
+  // Custom Alert / Notification Modal State
+  const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'confirm', title: '', message: '', onConfirm: () => {} }
+
+  // Active Target Trays
+  const [editingMovie, setEditingMovie] = useState(null);
+  const [activeMovieForScreening, setActiveMovieForScreening] = useState(null);
+  const [statsMovie, setStatsMovie] = useState(null);
+  const [statsScreenings, setStatsScreenings] = useState([]);
+  const [statsSelectedScreening, setStatsSelectedScreening] = useState(null);
+  const [bookedSeats, setBookedSeats] = useState([]);
+  const [loadingSeats, setLoadingSeats] = useState(false);
+
+  // Form Field Trays
   const [movieForm, setMovieForm] = useState({
-    film_name: "",
+    title: "",
     genre: "",
-    trailer_link: "",
+    duration: "",
     description: "",
-    release_date: "",
-    language: "English",
-    duration: 120,
-    poster_image: "",
-    status: "NOW_SHOWING",
+    language: "",
+    releaseDate: "",
+    posterImage: "",
+    trailerLink: "",
+    status: "Upcoming",
   });
 
   const [screeningForm, setScreeningForm] = useState({
+    screenId: "",
     showDate: "",
     startTime: "",
     endTime: "",
   });
 
-  // Fixed Default Configurations
-  const STATIC_SCREEN_ID = "SCREEN21580";
-  const SEAT_ROWS = ["A", "B", "C", "D"];
-  const SEAT_NUMBERS = Array.from({ length: 10 }, (_, i) => i + 1);
-
-  // --- HOOKS & HYDRATION EFFECTS ---
+  // --- INITIAL DATA FETCH ENGINE ---
   useEffect(() => {
-    fetchAllFilms();
-    fetchStaticSeats();
+    fetchAllData();
   }, []);
 
-  // Sync details when an active screening slot changes inside metrics drawer
-  useEffect(() => {
-    if (statsMovie && statsSelectedScreening) {
-      fetchBookedSeatsForShowtime(
-        statsMovie.film_id,
-        statsSelectedScreening.showtime_id,
-      );
-    } else {
-      setBookedSeatsMatrix([]);
-    }
-  }, [statsSelectedScreening, statsMovie]);
-
-  const fetchAllFilms = async () => {
+  const fetchAllData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await fetch("http://localhost:5000/film/get-all-film");
-      if (!res.ok) throw new Error("Failed to capture film catalog.");
-      const payload = await res.json();
-      setMovies(payload.data || []);
+      // 1. Fetch Movies
+      const filmRes = await fetch("http://localhost:5000/film/get-all-film");
+      const filmJson = await filmRes.json();
+
+      // 2. Fetch Screens for Dropdown
+      const screenRes = await fetch("http://localhost:5000/screen/");
+      const screenJson = await screenRes.json();
+
+      if (screenJson && screenJson.data) {
+        setScreens(screenJson.data);
+      }
+
+      if (filmJson && filmJson.data) {
+        // Hydrate each movie with its related showtimes from backend
+        const hydratedMovies = await Promise.all(
+          filmJson.data.map(async (film) => {
+            try {
+              const stRes = await fetch(
+                `http://localhost:5000/showtime/film/${film.film_id}`,
+              );
+              const stJson = await stRes.json();
+              return {
+                id: film.film_id,
+                title: film.film_name,
+                genre: film.genre,
+                duration: film.duration,
+                description: film.description,
+                language: film.language,
+                releaseDate: film.release_date
+                  ? film.release_date.split("T")[0]
+                  : "",
+                posterImage: film.poster_image,
+                trailerLink: film.trailer_link,
+                status: film.status,
+                screenings: stJson.data || [],
+              };
+            } catch (e) {
+              return {
+                id: film.film_id,
+                title: film.film_name,
+                genre: film.genre,
+                duration: film.duration,
+                description: film.description,
+                language: film.language,
+                releaseDate: film.release_date
+                  ? film.release_date.split("T")[0]
+                  : "",
+                posterImage: film.poster_image,
+                trailerLink: film.trailer_link,
+                status: film.status,
+                screenings: [],
+              };
+            }
+          }),
+        );
+        setMovies(hydratedMovies);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Catalog error occurred.");
+      showNotice(
+        "error",
+        "Data Connection Failure",
+        "Could not synchronize with database records.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchStaticSeats = async () => {
+  // --- LIVE RE-FETCH SUB-ROUTINE FOR SINGLE MOVIE (FOR SCREENING UPDATES) ---
+  const refreshSingleMovieScreenings = async (movieId) => {
     try {
-      const res = await fetch("http://localhost:5000/seat");
-      if (res.ok) {
-        const payload = await res.json();
-        setStaticSeatsLayout(payload.data || []);
-      }
-    } catch (e) {
-      console.error("Layout initialization failed:", e);
-    }
-  };
-
-  const fetchShowtimesForFilm = async (film) => {
-    if (!film) return;
-    try {
-      setSelectedMovieForShowtimes(film);
-      const res = await fetch(
-        `http://localhost:5000/showtime/film/${film.film_id}`,
+      const stRes = await fetch(
+        `http://localhost:5000/showtime/film/${movieId}`,
       );
-      if (!res.ok) throw new Error("Showtimes could not be compiled.");
-      const payload = await res.json();
-      setActiveScreenings(payload.data || []);
+      const stJson = await stRes.json();
+
+      setMovies((prev) =>
+        prev.map((m) =>
+          m.id === movieId ? { ...m, screenings: stJson.data || [] } : m,
+        ),
+      );
+
+      if (statsMovie && statsMovie.id === movieId) {
+        setStatsScreenings(stJson.data || []);
+      }
     } catch (err) {
-      console.error("Showtime extraction fail:", err);
-      setActiveScreenings([]);
+      console.error("Error updates on screening context streams:", err);
     }
   };
 
-  const fetchBookedSeatsForShowtime = async (filmId, showtimeId) => {
+  // --- LIVE AUDITORIUM SEAT MAP FETCH MATRIX ---
+  useEffect(() => {
+    if (statsMovie && statsSelectedScreening) {
+      fetchBookedSeats(statsMovie.id, statsSelectedScreening.showtime_id);
+    } else {
+      setBookedSeats([]);
+    }
+  }, [statsMovie, statsSelectedScreening]);
+
+  const fetchBookedSeats = async (filmId, showtimeId) => {
+    setLoadingSeats(true);
     try {
       const res = await fetch(
         `http://localhost:5000/book-seat/${filmId}/${showtimeId}`,
-        { cache: "no-store" },
       );
-      if (res.ok) {
-        const payload = await res.json();
-        setBookedSeatsMatrix(payload.data || []);
+      const json = await res.json();
+      if (json && json.data) {
+        setBookedSeats(json.data);
+      } else {
+        setBookedSeats([]);
       }
-    } catch (e) {
-      console.error("Booking verification breakdown:", e);
+    } catch (err) {
+      setBookedSeats([]);
+    } finally {
+      setLoadingSeats(false);
     }
   };
 
-  // --- FILM SYSTEM INTERFACES ---
-  const handleOpenAddMovie = () => {
+  // --- POPUP NOTIFICATION TRIGGER UTILITY ---
+  const showNotice = (type, title, message, onConfirm = null) => {
+    setNotification({ type, title, message, onConfirm });
+  };
+
+  const closeNotice = () => {
+    setNotification(null);
+  };
+
+  // --- DATA INTERMEDIARY PROFILE ACTIONS ---
+  const openMovieAdd = () => {
     setEditingMovie(null);
     setMovieForm({
-      film_name: "",
+      title: "",
       genre: "",
-      trailer_link: "",
+      duration: "",
       description: "",
-      release_date: new Date().toISOString().split("T")[0],
       language: "English",
-      duration: 120,
-      poster_image: "",
-      status: "NOW_SHOWING",
+      releaseDate: "",
+      posterImage: "",
+      trailerLink: "",
+      status: "Upcoming",
     });
     setIsMovieModalOpen(true);
   };
 
-  const handleOpenEditMovie = (movie) => {
+  const openMovieEdit = (movie) => {
     setEditingMovie(movie);
     setMovieForm({
-      film_name: movie.film_name || "",
-      genre: movie.genre || "",
-      trailer_link: movie.trailer_link || "",
+      title: movie.title,
+      genre: movie.genre,
+      duration: movie.duration,
       description: movie.description || "",
-      release_date: movie.release_date ? movie.release_date.split("T")[0] : "",
       language: movie.language || "English",
-      duration: Number(movie.duration) || 120,
-      poster_image: movie.poster_image || "",
-      status: movie.status || "NOW_SHOWING",
+      releaseDate: movie.releaseDate || "",
+      posterImage: movie.posterImage || "",
+      trailerLink: movie.trailerLink || "",
+      status: movie.status || "Upcoming",
     });
     setIsMovieModalOpen(true);
   };
 
+  const openStatsModal = (movie) => {
+    setStatsMovie(movie);
+    setStatsScreenings(movie.screenings);
+    setStatsSelectedScreening(
+      movie.screenings && movie.screenings.length > 0
+        ? movie.screenings[0]
+        : null,
+    );
+    setIsStatsModalOpen(true);
+  };
+
+  // --- FILM DATABASE MUTATION HANDLERS (CREATE / UPDATE / DELETE) ---
   const handleMovieSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      film_name: movieForm.title,
+      genre: movieForm.genre,
+      duration: parseInt(movieForm.duration) || 120,
+      description: movieForm.description,
+      language: movieForm.language,
+      release_date: movieForm.releaseDate,
+      poster_image: movieForm.posterImage,
+      trailer_link: movieForm.trailerLink,
+      status: movieForm.status,
+    };
+
     try {
-      const targetUrl = editingMovie
-        ? `http://localhost:5000/film/update/${editingMovie.film_id}`
-        : "http://localhost:5000/film/save";
+      let url = "http://localhost:5000/film/save";
+      let method = "POST";
 
-      const method = editingMovie ? "PUT" : "POST";
+      if (editingMovie) {
+        url = `http://localhost:5000/film/update/${editingMovie.id}`;
+        method = "PUT";
+      }
 
-      const res = await fetch(targetUrl, {
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...movieForm,
-          duration: Number(movieForm.duration),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Could not execute profile commit.");
-      setIsMovieModalOpen(false);
-      fetchAllFilms();
-    } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Error processing movie metadata.",
-      );
-    }
-  };
+      const resData = await res.json();
 
-  const handleMovieDelete = async (filmId) => {
-    if (
-      !confirm(
-        "Are you sure you want to completely remove this film and all associated tracking data?",
-      )
-    )
-      return;
-    try {
-      const res = await fetch(`http://localhost:5000/film/delete/${filmId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Deletion target declined by server.");
-      fetchAllFilms();
-      if (selectedMovieForShowtimes?.film_id === filmId) {
-        setSelectedMovieForShowtimes(null);
-        setActiveScreenings([]);
+      if (res.ok) {
+        showNotice(
+          "success",
+          "Catalog Updated",
+          `Successfully saved context tracking data for: ${movieForm.title}`,
+        );
+        setIsMovieModalOpen(false);
+        fetchAllData();
+      } else {
+        showNotice(
+          "error",
+          "Submission Fault",
+          resData.message || "Could not validate backend entity entries.",
+        );
       }
     } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Error executing structural purge.",
+      showNotice(
+        "error",
+        "Network Error",
+        "The server rejected the operational persistence command thread.",
       );
     }
   };
 
-  // --- SHOWTIME SYSTEM INTERFACES ---
-  const handleOpenAddShowtime = (movie) => {
-    setEditingScreening(null);
-    setSelectedMovieForShowtimes(movie);
-    setScreeningForm({
-      showDate: new Date().toISOString().split("T")[0],
-      startTime: "18:30:00",
-      endTime: "21:15:00",
-    });
-    setIsScreeningModalOpen(true);
+  const triggerMovieDelete = (movieId, movieTitle) => {
+    showNotice(
+      "confirm",
+      "Purge Confirmation Required",
+      `Are you sure you want to permanently delete "${movieTitle}"? All automated screening tracks will be cleaned from structural storage matrices.`,
+      async () => {
+        try {
+          const res = await fetch(
+            `http://localhost:5000/film/delete/${movieId}`,
+            {
+              method: "DELETE",
+            },
+          );
+          const data = await res.json();
+          if (res.ok) {
+            showNotice(
+              "success",
+              "Record Cleared",
+              "The movie record has been successfully purged.",
+            );
+            fetchAllData();
+          } else {
+            showNotice(
+              "error",
+              "Purge Failure",
+              data.message || "Database engine denied requested operation.",
+            );
+          }
+        } catch (err) {
+          showNotice(
+            "error",
+            "Network Failure",
+            "Execution breakdown intercepted on live operational pipeline.",
+          );
+        }
+      },
+    );
   };
 
-  const handleOpenEditShowtime = (screening, movie) => {
-    setEditingScreening(screening);
-    setSelectedMovieForShowtimes(movie);
+  // --- SHOWTIME ROUTINE HANDLERS (CREATE / DELETE) ---
+  const openScreeningAdd = (movie) => {
+    setActiveMovieForScreening(movie);
     setScreeningForm({
-      showDate: screening.show_date ? screening.show_date.split("T")[0] : "",
-      startTime: screening.start_time || "",
-      endTime: screening.end_time || "",
+      screenId: screens.length > 0 ? screens[0].screen_id : "",
+      showDate: new Date().toISOString().split("T")[0],
+      startTime: "12:00",
+      endTime: "14:30",
     });
     setIsScreeningModalOpen(true);
   };
 
   const handleScreeningSubmit = async (e) => {
     e.preventDefault();
+
+    if (!screeningForm.screenId) {
+      showNotice(
+        "error",
+        "Configuration Incomplete",
+        "Please register a valid target Screen allocation asset.",
+      );
+      return;
+    }
+
+    const payload = {
+      filmId: activeMovieForScreening.id,
+      screenId: screeningForm.screenId,
+      showDate: screeningForm.showDate,
+      startTime: screeningForm.startTime,
+      endTime: screeningForm.endTime,
+    };
+
     try {
-      const targetUrl = editingScreening
-        ? `http://localhost:5000/showtime/update/${editingScreening.showtime_id}`
-        : "http://localhost:5000/showtime/save";
-
-      const method = editingScreening ? "PUT" : "POST";
-
-      // Payload properties match target backend specifications exactly
-      const payload = {
-        filmId: selectedMovieForShowtimes.film_id,
-        screenId: STATIC_SCREEN_ID,
-        showDate: screeningForm.showDate,
-        startTime: screeningForm.startTime.includes(".")
-          ? screeningForm.startTime
-          : `${screeningForm.startTime}.000000`,
-        endTime: screeningForm.endTime.includes(".")
-          ? screeningForm.endTime
-          : `${screeningForm.endTime}.000000`,
-      };
-
-      const res = await fetch(targetUrl, {
-        method,
+      const res = await fetch("http://localhost:5000/showtime/save", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok)
-        throw new Error("Could not execute showtime mutation profile.");
-      setIsScreeningModalOpen(false);
-      fetchShowtimesForFilm(selectedMovieForShowtimes);
-    } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Error establishing live schedule block.",
-      );
-    }
-  };
+      const resData = await res.json();
 
-  const handleScreeningDelete = async (screeningId) => {
-    if (
-      !confirm(
-        "Are you sure you want to cancel and delete this scheduled showtime slot?",
-      )
-    )
-      return;
-    try {
-      const res = await fetch(
-        `http://localhost:5000/showtime/delete/${screeningId}`,
-        { method: "DELETE" },
-      );
-      if (!res.ok) throw new Error("Server declined showtime wipe sequence.");
-      fetchShowtimesForFilm(selectedMovieForShowtimes);
-    } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Showtime removal process failed.",
-      );
-    }
-  };
-
-  // --- ANALYTICS MODAL SLIDE ENGINE ---
-  const handleOpenStatsModal = async (movie) => {
-    setStatsMovie(movie);
-    setStatsSelectedScreening(null);
-    setBookedSeatsMatrix([]);
-    setIsStatsModalOpen(true);
-
-    try {
-      const res = await fetch(
-        `http://localhost:5000/showtime/film/${movie.film_id}`,
-      );
       if (res.ok) {
-        const payload = await res.json();
-        const showtimes = payload.data || [];
-        if (showtimes.length > 0) {
-          setStatsSelectedScreening(showtimes[0]);
-        }
+        showNotice(
+          "success",
+          "Showtime Verified",
+          "New programmed screening slot correctly written to memory logs.",
+        );
+        setIsScreeningModalOpen(false);
+        refreshSingleMovieScreenings(activeMovieForScreening.id);
+      } else {
+        showNotice(
+          "error",
+          "Schedule Refused",
+          resData.message ||
+            "Selected slot overlaps or breaks structural screening logic rules.",
+        );
       }
-    } catch (e) {
-      console.error("Stats showtime mapping fetch dropped:", e);
+    } catch (err) {
+      showNotice(
+        "error",
+        "Server Timeout",
+        "Network layer failure during transactional transmission pipeline.",
+      );
     }
   };
+
+  const triggerScreeningDelete = (movieId, screeningId) => {
+    showNotice(
+      "confirm",
+      "Cancel Showtime Track",
+      "Are you sure you want to drop this individual programming session log?",
+      async () => {
+        try {
+          const res = await fetch(
+            `http://localhost:5000/showtime/delete/${screeningId}`,
+            {
+              method: "DELETE",
+            },
+          );
+          const data = await res.json();
+          if (res.ok) {
+            showNotice(
+              "success",
+              "Showtime Dropped",
+              "The projection session was removed safely.",
+            );
+            refreshSingleMovieScreenings(movieId);
+            if (statsSelectedScreening?.showtime_id === screeningId) {
+              setStatsSelectedScreening(null);
+            }
+          } else {
+            showNotice(
+              "error",
+              "Drop Failure",
+              data.message ||
+                "Request was bounced by verification ledger engines.",
+            );
+          }
+        } catch (err) {
+          showNotice(
+            "error",
+            "Transaction Fault",
+            "Pipeline tracking timed out during deletion query execution.",
+          );
+        }
+      },
+    );
+  };
+
+  // Filter Computation Layer
+  const filteredMovies = movies.filter(
+    (movie) =>
+      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      movie.genre.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // Auditorium Grid Configurations
+  const seatRows = ["A", "B", "C", "D", "E", "F"];
+  const seatNumbers = Array.from({ length: 10 }, (_, i) => i + 1);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] w-full bg-background text-foreground space-y-3">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-          Hydrating Management Control Matrix...
-        </p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 text-center max-w-md mx-auto my-10 bg-card border border-destructive/20 rounded-3xl space-y-3">
-        <AlertCircle className="mx-auto text-destructive" size={32} />
-        <p className="text-sm font-bold text-foreground">
-          Critical Error Syncing Server Components
-        </p>
-        <p className="text-xs text-muted-foreground">{error}</p>
-        <button
-          onClick={fetchAllFilms}
-          className="px-4 py-2 bg-input border border-border text-xs rounded-xl hover:bg-muted font-bold"
-        >
-          Retry Execution
-        </button>
+      <div className="w-full h-96 flex flex-col items-center justify-center space-y-4">
+        <div className="w-8 h-8 border-2 border-brand-lime border-t-transparent rounded-full animate-spin" />
+        <span className="text-zinc-500 font-bold tracking-widest text-[10px] uppercase">
+          Recompiling Core Data Trees...
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-6 animate-fadeIn pb-16">
-      {/* Top Action Header Bar (Search Row Removed) */}
-      <div className="flex flex-row justify-between items-center bg-card border border-border rounded-2xl p-4 shadow-xs">
-        <div>
-          <h1 className="text-base font-black tracking-tight uppercase text-foreground">
-            Cinema Catalog Matrix
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Administer runtime system films and associated allocation sessions.
-          </p>
+    <div className="w-full space-y-4 animate-fadeIn text-foreground">
+      {/* Control Configuration Filtering Matrix Row */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center bg-card border border-border rounded-2xl p-4 shadow-xs">
+        <div className="relative w-full sm:w-80">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50"
+            size={14}
+          />
+          <input
+            type="text"
+            placeholder="Search catalog by title or genre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-input border border-border text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+          />
         </div>
         <button
-          onClick={handleOpenAddMovie}
-          className="flex items-center gap-2 px-5 py-2.5 bg-brand-lime text-black font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0"
+          onClick={openMovieAdd}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-lime text-black font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0"
         >
-          <Plus size={14} /> Add New Film
+          <Plus size={14} /> Register Film Entry
         </button>
       </div>
 
-      {/* CORE CATALOG DATA ARCHITECTURE GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Left/Center Component: Movies Administration Workspace */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-2xl overflow-hidden shadow-xs">
-          <div className="w-full overflow-x-auto custom-scrollbar">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-border bg-input/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground select-none">
-                  <th className="p-4 pl-6 w-[45%]">Film Metadata Profile</th>
-                  <th className="p-4 w-[20%]">Genre Matrix</th>
-                  <th className="p-4 w-[15%]">Run-length</th>
-                  <th className="p-4 pr-6 text-right w-[20%]">
-                    Operations Cluster
-                  </th>
+      {/* Main Catalog View Presentation Layout Container Grid Table */}
+      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs">
+        <div className="w-full overflow-x-auto custom-scrollbar">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-border bg-input/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground select-none">
+                <th className="p-4 pl-6 w-[30%]">Film Metadata & Details</th>
+                <th className="p-4 w-[15%]">Genre Track</th>
+                <th className="p-4 w-[10%]">Duration</th>
+                <th className="p-4 w-[25%]">Active Programmed Screenings</th>
+                <th className="p-4 pr-6 text-right w-[20%]">Actions Matrix</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60 text-xs font-medium text-foreground">
+              {filteredMovies.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="p-8 text-center text-muted-foreground/60 italic"
+                  >
+                    No cinematic records matched your search parameters.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60 text-xs font-medium text-foreground">
-                {movies.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan="4"
-                      className="p-12 text-center text-muted-foreground/60 italic font-mono text-xs"
-                    >
-                      No cinema profiles captured inside active cluster
-                      databases.
-                    </td>
-                  </tr>
-                ) : (
-                  movies.map((movie) => {
-                    const isTarget =
-                      selectedMovieForShowtimes?.film_id === movie.film_id;
-                    return (
-                      <tr
-                        key={movie.film_id}
-                        onClick={() => fetchShowtimesForFilm(movie)}
-                        className={`transition-colors cursor-pointer group ${isTarget ? "bg-brand-lime/[0.02] border-l-2 border-l-brand-lime" : "hover:bg-foreground/[0.01]"}`}
-                      >
-                        <td className="p-4 pl-6">
-                          <div className="flex items-center gap-4">
-                            {movie.poster_image ? (
-                              <img
-                                src={movie.poster_image}
-                                alt=""
-                                className="h-10 w-7 rounded object-cover border border-border shrink-0 shadow-xs"
-                              />
-                            ) : (
-                              <div className="h-10 w-7 rounded bg-input border border-border flex items-center justify-center shrink-0">
-                                <Film
-                                  size={12}
-                                  className="text-muted-foreground/40"
-                                />
-                              </div>
-                            )}
-                            <div className="space-y-0.5 max-w-[240px]">
-                              <span className="font-bold text-foreground block group-hover:text-brand-lime transition-colors duration-150 truncate">
-                                {movie.film_name}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground line-clamp-1 font-normal">
-                                {movie.description}
-                              </span>
-                              <span className="text-[8px] font-mono text-muted-foreground/40 block tracking-tight uppercase">
-                                {movie.status} • {movie.language}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-
-                        <td className="p-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-foreground/[0.03] border border-border text-muted-foreground text-[10px] font-bold tracking-tight uppercase">
-                            {movie.genre}
-                          </span>
-                        </td>
-
-                        <td className="p-4 text-muted-foreground font-mono font-semibold">
-                          {movie.duration} min
-                        </td>
-
-                        <td
-                          className="p-4 pr-6 text-right"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => handleOpenStatsModal(movie)}
-                              className="p-2 rounded-lg text-brand-lime bg-brand-lime/[0.06] hover:bg-brand-lime hover:text-black border border-brand-lime/10 transition-all"
-                              title="Inspect Active Allocation Metrics"
-                            >
-                              <BarChart3 size={13} />
-                            </button>
-                            <button
-                              onClick={() => handleOpenEditMovie(movie)}
-                              className="p-2 rounded-lg text-muted-foreground/70 hover:text-foreground hover:bg-foreground/[0.04] border border-transparent hover:border-border transition-all"
-                              title="Modify Profile Properties"
-                            >
-                              <Edit2 size={13} />
-                            </button>
-                            <button
-                              onClick={() => handleMovieDelete(movie.film_id)}
-                              className="p-2 rounded-lg text-muted-foreground/40 hover:text-red-500 hover:bg-red-500/10 border border-transparent transition-all"
-                              title="Execute Absolute Purge Sequence"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Right Sidebar Component: Screenings & Showtime Session Matrix */}
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between pb-2 border-b border-border">
-            <div>
-              <h2 className="text-xs font-black uppercase tracking-wider text-foreground">
-                Session Scheduler
-              </h2>
-              <p className="text-[10px] text-muted-foreground">
-                Manage specific timeframe instances.
-              </p>
-            </div>
-            {selectedMovieForShowtimes && (
-              <button
-                onClick={() => handleOpenAddShowtime(selectedMovieForShowtimes)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background font-black text-[10px] uppercase tracking-wider rounded-lg hover:opacity-90 transition-all"
-              >
-                <Plus size={11} /> Create Slot
-              </button>
-            )}
-          </div>
-
-          {!selectedMovieForShowtimes ? (
-            <div className="py-12 px-4 border border-dashed border-border rounded-xl text-center text-xs italic text-muted-foreground/60 font-mono">
-              Select an ongoing film profile target row to audit screening
-              session lines.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="p-3 bg-input/40 border border-border rounded-xl">
-                <span className="text-[8px] font-bold text-brand-lime uppercase tracking-widest font-mono block">
-                  Context Selection
-                </span>
-                <span className="text-xs font-bold text-foreground block mt-0.5 truncate">
-                  {selectedMovieForShowtimes.film_name}
-                </span>
-              </div>
-
-              {activeScreenings.length === 0 ? (
-                <div className="py-8 text-center text-xs italic text-muted-foreground/50 bg-input/20 rounded-xl">
-                  No execution showtime slots deployed on track.
-                </div>
               ) : (
-                <div className="space-y-2 max-h-[380px] overflow-y-auto custom-scrollbar pr-1">
-                  {activeScreenings.map((scr) => (
-                    <div
-                      key={scr.showtime_id}
-                      className="p-3 bg-input/60 border border-border rounded-xl flex items-center justify-between group/slot hover:border-muted-foreground/20 transition-all"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Calendar
-                            size={12}
-                            className="text-muted-foreground"
-                          />
-                          <span className="font-mono text-xs font-bold text-foreground">
-                            {scr.show_date
-                              ? scr.show_date.split("T")[0]
-                              : "No Date"}
-                          </span>
+                filteredMovies.map((movie) => (
+                  <tr
+                    key={movie.id}
+                    className="hover:bg-foreground/[0.01] transition-colors group"
+                  >
+                    {/* Identity Column */}
+                    <td className="p-4 pl-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-9 rounded-md bg-input overflow-hidden flex-shrink-0 border border-border">
+                          {movie.posterImage ? (
+                            <img
+                              src={movie.posterImage}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 bg-zinc-900">
+                              <Film size={12} />
+                            </div>
+                          )}
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground">
-                          <span className="text-brand-lime font-bold">
-                            {scr.start_time?.slice(0, 5)} -{" "}
-                            {scr.end_time?.slice(0, 5)}
+                        <div className="truncate max-w-[220px]">
+                          <span className="font-bold text-foreground block group-hover:text-brand-lime transition-colors duration-150 truncate">
+                            {movie.title}
                           </span>
-                          <span>•</span>
-                          <span className="text-foreground/70 text-[10px] font-sans font-semibold">
-                            {scr.screen_name || "Screen Hall A"}
+                          <span className="text-[9px] font-mono text-muted-foreground/50 block mt-0.5 truncate">
+                            ID: {movie.id}
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 opacity-80 group-hover/slot:opacity-100 transition-opacity">
+                    </td>
+
+                    {/* Genre Track Column */}
+                    <td className="p-4">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-foreground/[0.03] border border-border text-muted-foreground text-[11px] font-semibold">
+                        {movie.genre}
+                      </span>
+                    </td>
+
+                    {/* Clock Metric Node */}
+                    <td className="p-4 text-muted-foreground font-mono">
+                      <span>{movie.duration} min</span>
+                    </td>
+
+                    {/* Screening Badging Array Fields */}
+                    <td className="p-4">
+                      <div className="space-y-1.5 max-w-[280px]">
+                        {!movie.screenings || movie.screenings.length === 0 ? (
+                          <span className="text-[10px] text-muted-foreground/40 italic block py-0.5">
+                            No showtimes live
+                          </span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {movie.screenings.map((scr) => (
+                              <div
+                                key={scr.showtime_id}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-input border border-border rounded text-[10px] font-mono font-bold group/badge"
+                              >
+                                <span className="text-foreground">
+                                  {scr.start_time.substring(0, 5)}
+                                </span>
+                                <span className="text-muted-foreground/30 text-[8px]">
+                                  •
+                                </span>
+                                <span className="text-brand-lime text-[9px] font-semibold truncate max-w-[60px]">
+                                  {scr.screen_name || "Screen"}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    triggerScreeningDelete(
+                                      movie.id,
+                                      scr.showtime_id,
+                                    )
+                                  }
+                                  className="ml-1 text-muted-foreground/30 hover:text-red-400 transition-colors"
+                                  title="Cancel Showtime"
+                                >
+                                  <X size={10} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => openScreeningAdd(movie)}
+                          className="text-[10px] text-brand-lime hover:underline font-black uppercase tracking-wider block pt-0.5 text-left"
+                        >
+                          + Add Showtime
+                        </button>
+                      </div>
+                    </td>
+
+                    {/* Operations Actions Interface Cluster Column */}
+                    <td className="p-4 pr-6 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => openStatsModal(movie)}
+                          className="p-2 rounded-lg text-brand-lime bg-brand-lime/[0.06] hover:bg-brand-lime hover:text-black border border-brand-lime/10 transition-all"
+                          title="View High-Density Audit Mapping"
+                        >
+                          <BarChart3 size={13} />
+                        </button>
+                        <button
+                          onClick={() => openMovieEdit(movie)}
+                          className="p-2 rounded-lg text-muted-foreground/70 hover:text-foreground hover:bg-foreground/[0.04] border border-transparent hover:border-border transition-all"
+                          title="Modify Details"
+                        >
+                          <Edit2 size={13} />
+                        </button>
                         <button
                           onClick={() =>
-                            handleOpenEditShowtime(
-                              scr,
-                              selectedMovieForShowtimes,
-                            )
+                            triggerMovieDelete(movie.id, movie.title)
                           }
-                          className="p-1.5 rounded-md hover:bg-foreground/[0.04] text-muted-foreground hover:text-foreground transition-all"
+                          className="p-2 rounded-lg text-muted-foreground/50 hover:text-red-500 hover:bg-red-500/10 border border-transparent transition-all"
+                          title="Purge Feature"
                         >
-                          <Edit2 size={11} />
-                        </button>
-                        <button
-                          onClick={() => handleScreeningDelete(scr.showtime_id)}
-                          className="p-1.5 rounded-md hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
-                        >
-                          <Trash2 size={11} />
+                          <Trash2 size={13} />
                         </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    </td>
+                  </tr>
+                ))
               )}
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* --- PANEL SLIDE-OVER: METRICS INSIGHTS BOARD & LIVE BOOKINGS MATRIX --- */}
+      {/* --- SLIDE-OVER DRAWER INTERFACE PANEL: HIGH EXPANSION DENSITY AUDIT METRICS --- */}
       {isStatsModalOpen && statsMovie && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex justify-end animate-fadeIn select-none">
           <div className="bg-card border-l border-border w-full max-w-2xl h-full p-6 flex flex-col justify-between shadow-2xl text-foreground overflow-y-auto custom-scrollbar animate-slideLeft">
             <div>
+              {/* Header Context Bar */}
               <div className="flex justify-between items-start border-b border-border pb-4 mb-6">
                 <div>
                   <span className="text-[10px] font-bold text-brand-lime uppercase tracking-widest font-mono block mb-1">
-                    Session Matrix Engine
+                    Seat Audit Mapping Engine
                   </span>
                   <h2 className="text-lg font-black text-foreground tracking-tight">
-                    {statsMovie.film_name}
+                    {statsMovie.title}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {statsMovie.genre} • {statsMovie.duration} Minutes
+                    {statsMovie.genre} • {statsMovie.duration} min
                   </p>
                 </div>
                 <button
@@ -1202,74 +1478,92 @@ export default function FilmDashboard() {
                 </button>
               </div>
 
-              {/* Dynamic Step: Showtime Slot Verification Line */}
-              <div className="space-y-2 mb-6">
-                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">
-                  Audited Active Operational Slot
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {movies.find((m) => m.film_id === statsMovie.film_id) &&
-                  !statsSelectedScreening ? (
-                    <div className="p-4 w-full bg-input border border-dashed border-border rounded-xl text-center text-xs italic text-muted-foreground/60 font-mono">
-                      No showtime parameters configured on target index tracking
-                      lists.
-                    </div>
-                  ) : (
-                    // Re-fetch mapping values directly inline
-                    movies.map((m) => {
-                      if (m.film_id !== statsMovie.film_id) return null;
-                      return (
-                        <div
-                          key="stats-slots-group"
-                          className="flex flex-wrap gap-2 w-full"
-                        >
-                          {activeScreenings.map((scr) => {
-                            const isTarget =
-                              statsSelectedScreening?.showtime_id ===
-                              scr.showtime_id;
-                            return (
-                              <button
-                                key={scr.showtime_id}
-                                onClick={() => setStatsSelectedScreening(scr)}
-                                className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all text-left flex items-center gap-3 ${
-                                  isTarget
-                                    ? "bg-brand-lime border-brand-lime text-black font-black shadow-xs"
-                                    : "bg-input border-border text-foreground hover:border-muted-foreground/40"
-                                }`}
-                              >
-                                <Clock size={13} />
-                                <div>
-                                  <span className="block font-mono leading-none">
-                                    {scr.start_time?.slice(0, 5)}
-                                  </span>
-                                  <span
-                                    className={`text-[8px] uppercase tracking-tight block mt-0.5 font-bold ${isTarget ? "text-black/60" : "text-muted-foreground"}`}
-                                  >
-                                    {scr.show_date
-                                      ? scr.show_date.split("T")[0]
-                                      : "Date Variant"}{" "}
-                                    • {scr.screen_name || "Hall A"}
-                                  </span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      );
-                    })
-                  )}
+              {/* Master Volume Box Rows */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <div className="bg-input border border-border/80 p-4 rounded-xl">
+                  <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
+                    Designated Language
+                  </span>
+                  <div className="flex items-center gap-2 mt-1 text-foreground font-mono text-base font-bold">
+                    <Languages size={16} className="text-brand-lime" />
+                    <span className="text-sm uppercase tracking-wider">
+                      {statsMovie.language || "Unknown"}
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-input border border-border/80 p-4 rounded-xl">
+                  <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
+                    Live Booking Index Metrics
+                  </span>
+                  <div className="flex items-center gap-2 mt-1 text-emerald-400 font-mono text-base font-bold">
+                    <TrendingUp size={16} className="text-emerald-500/40" />
+                    <span className="text-sm text-foreground">
+                      {statsSelectedScreening
+                        ? `${bookedSeats.length} Active Reservations`
+                        : "No Selection Triggered"}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Dynamic Interactive Auditorium Grid Map Configuration Topology */}
+              {/* Session Selection Menu Array */}
+              <div className="space-y-2 mb-6">
+                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-wider block">
+                  Select Active Screening Session Slot
+                </label>
+                {!statsScreenings || statsScreenings.length === 0 ? (
+                  <div className="p-4 bg-input border border-dashed border-border rounded-xl text-center text-xs italic text-muted-foreground/60">
+                    No active runtime showtimes available to compile analytics.
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {statsScreenings.map((scr) => {
+                      const isTarget =
+                        statsSelectedScreening?.showtime_id === scr.showtime_id;
+                      return (
+                        <button
+                          key={scr.showtime_id}
+                          onClick={() => setStatsSelectedScreening(scr)}
+                          className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all text-left flex items-center gap-3 ${
+                            isTarget
+                              ? "bg-brand-lime border-brand-lime text-black font-black shadow-xs shadow-brand-lime/10"
+                              : "bg-input border-border text-foreground hover:border-muted-foreground/40"
+                          }`}
+                        >
+                          <Clock size={13} />
+                          <div>
+                            <span className="block font-mono leading-none">
+                              {scr.start_time.substring(0, 5)} -{" "}
+                              {scr.end_time.substring(0, 5)}
+                            </span>
+                            <span
+                              className={`text-[8px] uppercase tracking-tight block mt-0.5 font-bold ${
+                                isTarget
+                                  ? "text-black/60"
+                                  : "text-muted-foreground"
+                              }`}
+                            >
+                              {scr.screen_name} •{" "}
+                              {scr.show_date ? scr.show_date.split("T")[0] : ""}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Interactive Auditorium Grid Topology Map Frame */}
               {statsSelectedScreening && (
                 <div className="border border-border bg-input/20 rounded-2xl p-5 space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border/60">
                     <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                       <Armchair size={14} className="text-brand-lime" />{" "}
-                      Occupancy Allocation Mapping Layout
+                      Auditorium Seat Allocation Mapping Layout
                     </h4>
 
+                    {/* Color Map Coding Index Headers */}
                     <div className="flex items-center gap-4 text-[10px] font-semibold text-muted-foreground font-mono">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-xs bg-foreground/[0.06] border border-border block" />
@@ -1277,85 +1571,84 @@ export default function FilmDashboard() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-xs bg-brand-lime border border-brand-lime block" />
-                        <span>Booked ({bookedSeatsMatrix.length})</span>
+                        <span>Booked ({bookedSeats.length})</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Curving Architecture Vector Line Screen Element */}
+                  {/* Curved Silver Screen Architecture Design Element */}
                   <div className="relative w-full max-w-sm mx-auto text-center pt-2">
                     <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-brand-lime/40 to-transparent rounded-full blur-xs" />
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent mt-0.5" />
                     <span className="text-[8px] font-black uppercase tracking-[0.5em] text-muted-foreground/40 block mt-2">
-                      Auditorium Front Screen Arc
+                      Auditorium Front Screen Vector
                     </span>
                   </div>
 
-                  {/* Seat Grid Layout Execution Parsing Loop */}
-                  <div className="flex flex-col gap-2 max-w-md mx-auto pt-4">
-                    {SEAT_ROWS.map((row) => (
-                      <div key={row} className="flex items-center gap-3">
-                        <span className="w-3 text-[10px] font-black font-mono text-muted-foreground/40">
-                          {row}
-                        </span>
-                        <div className="flex-1 grid grid-cols-10 gap-1.5">
-                          {SEAT_NUMBERS.map((num) => {
-                            const seatCode = `${row}${num}`;
-                            // Cross verify against layout type arrays if available
-                            const matchingLayoutSeat = staticSeatsLayout.find(
-                              (s) =>
-                                s.row_label === row && s.seat_number === num,
-                            );
-                            const isDamaged =
-                              matchingLayoutSeat?.seat_type === "DAMAGE";
-                            const isBooked =
-                              bookedSeatsMatrix.includes(seatCode);
-
-                            return (
-                              <div
-                                key={seatCode}
-                                className={`aspect-square rounded-md text-[8px] font-bold font-mono flex items-center justify-center transition-all ${
-                                  isDamaged
-                                    ? "bg-red-500/20 text-red-400 border border-red-500/30 line-through cursor-not-allowed"
-                                    : isBooked
+                  {/* Alphanumeric Layout Execution Loop */}
+                  {loadingSeats ? (
+                    <div className="py-12 text-center text-xs text-muted-foreground/60 italic">
+                      Scanning transaction logs for allocated seat arrays...
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 max-w-md mx-auto pt-4">
+                      {seatRows.map((row) => (
+                        <div key={row} className="flex items-center gap-3">
+                          <span className="w-3 text-[10px] font-black font-mono text-muted-foreground/40">
+                            {row}
+                          </span>
+                          <div className="flex-1 grid grid-cols-10 gap-1.5">
+                            {seatNumbers.map((num) => {
+                              const seatCode = `${row}${num}`;
+                              // Support both exact matching and common variations like padded seat index formatting
+                              const isBooked =
+                                bookedSeats.includes(seatCode) ||
+                                bookedSeats.includes(`${row}0${num}`);
+                              return (
+                                <div
+                                  key={seatCode}
+                                  className={`aspect-square rounded-md text-[8px] font-bold font-mono flex items-center justify-center transition-all ${
+                                    isBooked
                                       ? "bg-brand-lime text-black border border-brand-lime shadow-xs font-black scale-95"
-                                      : "bg-foreground/[0.04] border border-border/80 text-muted-foreground/60"
-                                }`}
-                                title={`Seat Code: ${seatCode} [${isDamaged ? "DAMAGED" : isBooked ? "Booked Session Assignment" : "Vacant Inventory"}]`}
-                              >
-                                {num}
-                              </div>
-                            );
-                          })}
+                                      : "bg-foreground/[0.04] border border-border/80 text-muted-foreground/60 hover:border-muted-foreground/30"
+                                  }`}
+                                  title={`Seat Node: ${seatCode} [${isBooked ? "Occupied" : "Vacant Available"}]`}
+                                >
+                                  {num}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
+            {/* Close Trigger Action Footer */}
             <div className="mt-8 pt-4 border-t border-border flex justify-end">
               <button
                 onClick={() => setIsStatsModalOpen(false)}
-                className="px-5 py-2.5 bg-foreground text-background font-black text-xs uppercase tracking-widest rounded-xl hover:opacity-90 transition-all"
+                className="px-5 py-2.5 bg-foreground text-background font-black text-xs uppercase tracking-widest rounded-xl hover:opacity-90 active:scale-95 transition-all"
               >
-                Close Metrics Dashboard
+                Close Metrics Board
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- DIALOG COMPONENT: FILM CONFIGURATION FRAME (ADD / EDIT) --- */}
+      {/* --- DIALOG MODAL A: COMPONENT FILM PROFILE CREATE / EDIT OVERLAY --- */}
       {isMovieModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground animate-scaleUp">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-card border border-border w-full max-w-xl rounded-3xl p-6 shadow-xl relative text-foreground max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Film size={16} className="text-brand-lime" />{" "}
+                <Film size={16} className="text-brand-lime" />
                 {editingMovie
-                  ? "Modify Film Configuration"
+                  ? "Modify Existing Movie"
                   : "Register Catalog Profile"}
               </h3>
               <button
@@ -1366,24 +1659,23 @@ export default function FilmDashboard() {
               </button>
             </div>
 
-            <form onSubmit={handleMovieSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Film Name Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={movieForm.film_name}
-                  onChange={(e) =>
-                    setMovieForm({ ...movieForm, film_name: e.target.value })
-                  }
-                  placeholder="e.g., Avatar: The Way of Water"
-                  className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-semibold text-foreground"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleMovieSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                    Film Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={movieForm.title}
+                    onChange={(e) =>
+                      setMovieForm({ ...movieForm, title: e.target.value })
+                    }
+                    placeholder="e.g., Love in Kyoto"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-semibold"
+                  />
+                </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
                     Genre Track
@@ -1395,13 +1687,31 @@ export default function FilmDashboard() {
                     onChange={(e) =>
                       setMovieForm({ ...movieForm, genre: e.target.value })
                     }
-                    placeholder="Science Fiction"
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                    placeholder="e.g., Romance / Drama"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                    Runtime (min)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={movieForm.duration}
+                    onChange={(e) =>
+                      setMovieForm({ ...movieForm, duration: e.target.value })
+                    }
+                    placeholder="120"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
                   />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Language Node
+                    Language Track
                   </label>
                   <input
                     type="text"
@@ -1411,134 +1721,116 @@ export default function FilmDashboard() {
                       setMovieForm({ ...movieForm, language: e.target.value })
                     }
                     placeholder="English"
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Duration (min)
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    value={movieForm.duration}
-                    onChange={(e) =>
-                      setMovieForm({ ...movieForm, duration: e.target.value })
-                    }
-                    placeholder="192"
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono text-foreground"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
                   />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Release Profile Date
+                    Release Date
                   </label>
                   <input
                     type="date"
                     required
-                    value={movieForm.release_date}
+                    value={movieForm.releaseDate}
                     onChange={(e) =>
                       setMovieForm({
                         ...movieForm,
-                        release_date: e.target.value,
+                        releaseDate: e.target.value,
                       })
                     }
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Status Identifier
+                  Description Brief
+                </label>
+                <textarea
+                  rows={2}
+                  value={movieForm.description}
+                  onChange={(e) =>
+                    setMovieForm({ ...movieForm, description: e.target.value })
+                  }
+                  placeholder="Provide explicit operational details regarding feature narrative indexes..."
+                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                    Poster Vector URI
+                  </label>
+                  <input
+                    type="url"
+                    value={movieForm.posterImage}
+                    onChange={(e) =>
+                      setMovieForm({
+                        ...movieForm,
+                        posterImage: e.target.value,
+                      })
+                    }
+                    placeholder="https://example.com/poster.jpg"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                    Trailer Stream URL
+                  </label>
+                  <input
+                    type="url"
+                    value={movieForm.trailerLink}
+                    onChange={(e) =>
+                      setMovieForm({
+                        ...movieForm,
+                        trailerLink: e.target.value,
+                      })
+                    }
+                    placeholder="https://youtube.com/watch?..."
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                  Release Deployment Status
                 </label>
                 <select
                   value={movieForm.status}
                   onChange={(e) =>
                     setMovieForm({ ...movieForm, status: e.target.value })
                   }
-                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
                 >
-                  <option value="NOW_SHOWING">NOW_SHOWING</option>
-                  <option value="UPCOMING">UPCOMING</option>
-                  <option value="CONCLUDED">CONCLUDED</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Released">Released</option>
+                  <option value="NOW_SHOWING">Now Showing</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Poster Vector URL
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={movieForm.poster_image}
-                  onChange={(e) =>
-                    setMovieForm({ ...movieForm, poster_image: e.target.value })
-                  }
-                  placeholder="https://example.com/images/poster.jpg"
-                  className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono text-foreground"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Trailer Stream Route Link
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={movieForm.trailer_link}
-                  onChange={(e) =>
-                    setMovieForm({ ...movieForm, trailer_link: e.target.value })
-                  }
-                  placeholder="https://www.youtube.com/watch?v=d9MyW72ELq0"
-                  className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono text-foreground"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Structural Overview Summary Text
-                </label>
-                <textarea
-                  required
-                  rows={2}
-                  value={movieForm.description}
-                  onChange={(e) =>
-                    setMovieForm({ ...movieForm, description: e.target.value })
-                  }
-                  placeholder="Provide concise descriptive plot parameters..."
-                  className="w-full bg-input border border-border rounded-xl px-4 py-2 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
-                />
               </div>
 
               <button
                 type="submit"
                 className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
               >
-                {editingMovie
-                  ? "Commit Existing Updates"
-                  : "Deploy Catalog Frame"}
+                {editingMovie ? "Save Updates" : "Commit New Feature Track"}
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- DIALOG COMPONENT: SHOWTIME SCHEDULER BOARD (ADD / EDIT) --- */}
-      {isScreeningModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground animate-scaleUp">
+      {/* --- DIALOG MODAL B: PRODUCTION SHOWTIME SCHEDULER OVERLAY --- */}
+      {isScreeningModalOpen && activeMovieForScreening && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground">
             <div className="flex justify-between items-center mb-5">
               <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Clock size={16} className="text-brand-lime" />{" "}
-                {editingScreening
-                  ? "Modify Session Slot"
-                  : "Deploy Session Slot Track"}
+                <Clock size={16} className="text-brand-lime" /> Program
+                Screening Slot
               </h3>
               <button
                 onClick={() => setIsScreeningModalOpen(false)}
@@ -1547,13 +1839,46 @@ export default function FilmDashboard() {
                 <X size={18} />
               </button>
             </div>
-            <form
-              onSubmit={handleScreeningSubmit}
-              className="space-y-4 text-xs"
-            >
+
+            <div className="mb-4 bg-input/40 p-3 rounded-xl border border-border">
+              <span className="text-[9px] text-muted-foreground font-bold uppercase block tracking-wider">
+                Target Film Entity
+              </span>
+              <span className="text-xs font-black text-brand-lime">
+                {activeMovieForScreening.title}
+              </span>
+            </div>
+
+            <form onSubmit={handleScreeningSubmit} className="space-y-4">
               <div>
                 <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Calendar Allocation Date
+                  Auditorium Target Assignment
+                </label>
+                <select
+                  required
+                  value={screeningForm.screenId}
+                  onChange={(e) =>
+                    setScreeningForm({
+                      ...screeningForm,
+                      screenId: e.target.value,
+                    })
+                  }
+                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                >
+                  <option value="" disabled>
+                    Select Target Theater Location
+                  </option>
+                  {screens.map((sc) => (
+                    <option key={sc.screen_id} value={sc.screen_id}>
+                      {sc.screen_name} ({sc.screen_type} - Cap: {sc.capacity})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                  Calendar Projection Date
                 </label>
                 <input
                   type="date"
@@ -1565,16 +1890,19 @@ export default function FilmDashboard() {
                       showDate: e.target.value,
                     })
                   }
-                  className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+
+              {/* Enhanced Grid with Custom Interactive Picker Implementations */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Start Time Block
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1 flex items-center gap-1">
+                    <Clock size={10} className="text-brand-lime" /> Start
+                    Runtime Clock
                   </label>
                   <input
-                    type="text"
+                    type="time"
                     required
                     value={screeningForm.startTime}
                     onChange={(e) =>
@@ -1583,16 +1911,16 @@ export default function FilmDashboard() {
                         startTime: e.target.value,
                       })
                     }
-                    placeholder="18:30:00"
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono text-foreground"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    End Time Block
+                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1 flex items-center gap-1">
+                    <Clock size={10} className="text-red-400" /> End Expected
+                    Matrix
                   </label>
                   <input
-                    type="text"
+                    type="time"
                     required
                     value={screeningForm.endTime}
                     onChange={(e) =>
@@ -1601,31 +1929,73 @@ export default function FilmDashboard() {
                         endTime: e.target.value,
                       })
                     }
-                    placeholder="21:15:00"
-                    className="w-full bg-input border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime font-mono text-foreground"
+                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
                   />
                 </div>
               </div>
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Terminal Screen Target Assignment
-                </label>
-                <input
-                  type="text"
-                  disabled
-                  value={`${STATIC_SCREEN_ID} (Standard Hall A)`}
-                  className="w-full bg-input/60 border border-border rounded-xl px-4 py-2.5 text-muted-foreground select-none font-mono"
-                />
-              </div>
+
               <button
                 type="submit"
-                className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
+                className="w-full mt-4 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
               >
-                {editingScreening
-                  ? "Update Target Parameters"
-                  : "Launch Active Showtime Block"}
+                Deploy Showtime Track
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- STANDALONE CUSTOM MODAL NOTIFICATION LAYER PORTAL --- */}
+      {notification && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn select-none">
+          <div className="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-2xl text-foreground text-center space-y-4">
+            <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center">
+              {notification.type === "success" && (
+                <CheckCircle2 className="text-brand-lime w-10 h-10" />
+              )}
+              {notification.type === "error" && (
+                <AlertCircle className="text-red-500 w-10 h-10" />
+              )}
+              {notification.type === "confirm" && (
+                <Video className="text-amber-500 w-10 h-10" />
+              )}
+            </div>
+            <div>
+              <h4 className="text-sm font-black uppercase tracking-wider">
+                {notification.title}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                {notification.message}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              {notification.type === "confirm" ? (
+                <>
+                  <button
+                    onClick={() => {
+                      if (notification.onConfirm) notification.onConfirm();
+                      closeNotice();
+                    }}
+                    className="flex-1 py-2.5 bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-600 transition-colors"
+                  >
+                    Confirm Drop
+                  </button>
+                  <button
+                    onClick={closeNotice}
+                    className="flex-1 py-2.5 bg-input border border-border text-muted-foreground font-bold text-xs uppercase tracking-wider rounded-xl hover:text-foreground transition-colors"
+                  >
+                    Abort
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={closeNotice}
+                  className="w-full py-2.5 bg-foreground text-background font-black text-xs uppercase tracking-widest rounded-xl hover:opacity-90 transition-all"
+                >
+                  Dismiss Context Alert
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
