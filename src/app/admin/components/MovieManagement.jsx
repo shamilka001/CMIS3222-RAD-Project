@@ -838,7 +838,7 @@ export default function MovieManagement() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
   // Custom Alert / Notification Modal State
-  const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'confirm', title: '', message: '', onConfirm: () => {} }
+  const [notification, setNotification] = useState(null);
 
   // Active Target Trays
   const [editingMovie, setEditingMovie] = useState(null);
@@ -855,7 +855,7 @@ export default function MovieManagement() {
     genre: "",
     duration: "",
     description: "",
-    language: "",
+    language: "English",
     releaseDate: "",
     posterImage: "",
     trailerLink: "",
@@ -881,7 +881,7 @@ export default function MovieManagement() {
       const filmRes = await fetch("http://localhost:5000/film/get-all-film");
       const filmJson = await filmRes.json();
 
-      // 2. Fetch Screens for Dropdown
+      // 2. Fetch Screens for Dropdown Mapping References
       const screenRes = await fetch("http://localhost:5000/screen/");
       const screenJson = await screenRes.json();
 
@@ -945,7 +945,7 @@ export default function MovieManagement() {
     }
   };
 
-  // --- LIVE RE-FETCH SUB-ROUTINE FOR SINGLE MOVIE (FOR SCREENING UPDATES) ---
+  // --- LIVE RE-FETCH SUB-ROUTINE FOR SINGLE MOVIE ---
   const refreshSingleMovieScreenings = async (movieId) => {
     try {
       const stRes = await fetch(
@@ -958,7 +958,6 @@ export default function MovieManagement() {
           m.id === movieId ? { ...m, screenings: stJson.data || [] } : m,
         ),
       );
-
       if (statsMovie && statsMovie.id === movieId) {
         setStatsScreenings(stJson.data || []);
       }
@@ -1051,7 +1050,6 @@ export default function MovieManagement() {
   // --- FILM DATABASE MUTATION HANDLERS (CREATE / UPDATE / DELETE) ---
   const handleMovieSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       film_name: movieForm.title,
       genre: movieForm.genre,
@@ -1063,11 +1061,9 @@ export default function MovieManagement() {
       trailer_link: movieForm.trailerLink,
       status: movieForm.status,
     };
-
     try {
       let url = "http://localhost:5000/film/save";
       let method = "POST";
-
       if (editingMovie) {
         url = `http://localhost:5000/film/update/${editingMovie.id}`;
         method = "PUT";
@@ -1078,7 +1074,6 @@ export default function MovieManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const resData = await res.json();
 
       if (res.ok) {
@@ -1114,9 +1109,7 @@ export default function MovieManagement() {
         try {
           const res = await fetch(
             `http://localhost:5000/film/delete/${movieId}`,
-            {
-              method: "DELETE",
-            },
+            { method: "DELETE" },
           );
           const data = await res.json();
           if (res.ok) {
@@ -1158,7 +1151,6 @@ export default function MovieManagement() {
 
   const handleScreeningSubmit = async (e) => {
     e.preventDefault();
-
     if (!screeningForm.screenId) {
       showNotice(
         "error",
@@ -1175,14 +1167,12 @@ export default function MovieManagement() {
       startTime: screeningForm.startTime,
       endTime: screeningForm.endTime,
     };
-
     try {
       const res = await fetch("http://localhost:5000/showtime/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const resData = await res.json();
 
       if (res.ok) {
@@ -1219,9 +1209,7 @@ export default function MovieManagement() {
         try {
           const res = await fetch(
             `http://localhost:5000/showtime/delete/${screeningId}`,
-            {
-              method: "DELETE",
-            },
+            { method: "DELETE" },
           );
           const data = await res.json();
           if (res.ok) {
@@ -1253,14 +1241,12 @@ export default function MovieManagement() {
     );
   };
 
-  // Filter Computation Layer
   const filteredMovies = movies.filter(
     (movie) =>
       movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       movie.genre.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // Auditorium Grid Configurations
   const seatRows = ["A", "B", "C", "D", "E", "F"];
   const seatNumbers = Array.from({ length: 10 }, (_, i) => i + 1);
 
@@ -1277,7 +1263,7 @@ export default function MovieManagement() {
 
   return (
     <div className="w-full space-y-4 animate-fadeIn text-foreground">
-      {/* Control Configuration Filtering Matrix Row */}
+      {/* Search and Action Row */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-center bg-card border border-border rounded-2xl p-4 shadow-xs">
         <div className="relative w-full sm:w-80">
           <Search
@@ -1300,7 +1286,7 @@ export default function MovieManagement() {
         </button>
       </div>
 
-      {/* Main Catalog View Presentation Layout Container Grid Table */}
+      {/* Main Catalog View Presentation */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs">
         <div className="w-full overflow-x-auto custom-scrollbar">
           <table className="w-full border-collapse text-left">
@@ -1368,7 +1354,7 @@ export default function MovieManagement() {
                       <span>{movie.duration} min</span>
                     </td>
 
-                    {/* Screening Badging Array Fields */}
+                    {/* Screening Badging Fields */}
                     <td className="p-4">
                       <div className="space-y-1.5 max-w-[280px]">
                         {!movie.screenings || movie.screenings.length === 0 ? (
@@ -1377,34 +1363,49 @@ export default function MovieManagement() {
                           </span>
                         ) : (
                           <div className="flex flex-wrap gap-1">
-                            {movie.screenings.map((scr) => (
-                              <div
-                                key={scr.showtime_id}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-input border border-border rounded text-[10px] font-mono font-bold group/badge"
-                              >
-                                <span className="text-foreground">
-                                  {scr.start_time.substring(0, 5)}
-                                </span>
-                                <span className="text-muted-foreground/30 text-[8px]">
-                                  •
-                                </span>
-                                <span className="text-brand-lime text-[9px] font-semibold truncate max-w-[60px]">
-                                  {scr.screen_name || "Screen"}
-                                </span>
-                                <button
-                                  onClick={() =>
-                                    triggerScreeningDelete(
-                                      movie.id,
-                                      scr.showtime_id,
-                                    )
-                                  }
-                                  className="ml-1 text-muted-foreground/30 hover:text-red-400 transition-colors"
-                                  title="Cancel Showtime"
+                            {movie.screenings.map((scr) => {
+                              const matchedScreen = screens.find(
+                                (s) =>
+                                  s.screen_id === scr.screen_id ||
+                                  s.screen_id === scr.screenId,
+                              );
+                              const correctScreenName =
+                                scr.screen_name ||
+                                matchedScreen?.screen_name ||
+                                "Screen";
+
+                              return (
+                                <div
+                                  key={scr.showtime_id}
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-input border border-border rounded text-[10px] font-mono font-bold group/badge"
                                 >
-                                  <X size={10} />
-                                </button>
-                              </div>
-                            ))}
+                                  <span className="text-foreground">
+                                    {scr.start_time.substring(0, 5)}
+                                  </span>
+                                  <span className="text-muted-foreground/30 text-[8px]">
+                                    •
+                                  </span>
+                                  <span
+                                    className="text-brand-lime text-[9px] font-semibold truncate max-w-[80px]"
+                                    title={correctScreenName}
+                                  >
+                                    {correctScreenName}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      triggerScreeningDelete(
+                                        movie.id,
+                                        scr.showtime_id,
+                                      )
+                                    }
+                                    className="ml-1 text-muted-foreground/30 hover:text-red-400 transition-colors"
+                                    title="Cancel Showtime"
+                                  >
+                                    <X size={10} />
+                                  </button>
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                         <button
@@ -1416,7 +1417,7 @@ export default function MovieManagement() {
                       </div>
                     </td>
 
-                    {/* Operations Actions Interface Cluster Column */}
+                    {/* Actions Panel Column */}
                     <td className="p-4 pr-6 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
@@ -1452,7 +1453,7 @@ export default function MovieManagement() {
         </div>
       </div>
 
-      {/* --- SLIDE-OVER DRAWER INTERFACE PANEL: HIGH EXPANSION DENSITY AUDIT METRICS --- */}
+      {/* --- SIDE DRAWER: HIGH EXPANSION DENSITY AUDIT METRICS --- */}
       {isStatsModalOpen && statsMovie && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex justify-end animate-fadeIn select-none">
           <div className="bg-card border-l border-border w-full max-w-2xl h-full p-6 flex flex-col justify-between shadow-2xl text-foreground overflow-y-auto custom-scrollbar animate-slideLeft">
@@ -1478,7 +1479,7 @@ export default function MovieManagement() {
                 </button>
               </div>
 
-              {/* Master Volume Box Rows */}
+              {/* Volume Status Rows */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                 <div className="bg-input border border-border/80 p-4 rounded-xl">
                   <span className="text-[9px] text-muted-foreground block font-bold uppercase tracking-wide">
@@ -1520,6 +1521,15 @@ export default function MovieManagement() {
                     {statsScreenings.map((scr) => {
                       const isTarget =
                         statsSelectedScreening?.showtime_id === scr.showtime_id;
+                      const matchedScreen = screens.find(
+                        (s) =>
+                          s.screen_id === scr.screen_id ||
+                          s.screen_id === scr.screenId,
+                      );
+                      const displayScreenName =
+                        scr.screen_name ||
+                        matchedScreen?.screen_name ||
+                        "Screen";
                       return (
                         <button
                           key={scr.showtime_id}
@@ -1543,7 +1553,7 @@ export default function MovieManagement() {
                                   : "text-muted-foreground"
                               }`}
                             >
-                              {scr.screen_name} •{" "}
+                              {displayScreenName} •{" "}
                               {scr.show_date ? scr.show_date.split("T")[0] : ""}
                             </span>
                           </div>
@@ -1559,11 +1569,9 @@ export default function MovieManagement() {
                 <div className="border border-border bg-input/20 rounded-2xl p-5 space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border/60">
                     <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                      <Armchair size={14} className="text-brand-lime" />{" "}
-                      Auditorium Seat Allocation Mapping Layout
+                      <Armchair size={14} className="text-brand-lime" /> Layout
+                      Mapping Layout
                     </h4>
-
-                    {/* Color Map Coding Index Headers */}
                     <div className="flex items-center gap-4 text-[10px] font-semibold text-muted-foreground font-mono">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-xs bg-foreground/[0.06] border border-border block" />
@@ -1576,7 +1584,6 @@ export default function MovieManagement() {
                     </div>
                   </div>
 
-                  {/* Curved Silver Screen Architecture Design Element */}
                   <div className="relative w-full max-w-sm mx-auto text-center pt-2">
                     <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-brand-lime/40 to-transparent rounded-full blur-xs" />
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent mt-0.5" />
@@ -1585,7 +1592,6 @@ export default function MovieManagement() {
                     </span>
                   </div>
 
-                  {/* Alphanumeric Layout Execution Loop */}
                   {loadingSeats ? (
                     <div className="py-12 text-center text-xs text-muted-foreground/60 italic">
                       Scanning transaction logs for allocated seat arrays...
@@ -1600,10 +1606,12 @@ export default function MovieManagement() {
                           <div className="flex-1 grid grid-cols-10 gap-1.5">
                             {seatNumbers.map((num) => {
                               const seatCode = `${row}${num}`;
-                              // Support both exact matching and common variations like padded seat index formatting
+                              // Support both unpadded ("C1") and zero-padded ("C01") representations from backend
+                              const paddedSeatCode = `${row}0${num}`;
                               const isBooked =
                                 bookedSeats.includes(seatCode) ||
-                                bookedSeats.includes(`${row}0${num}`);
+                                bookedSeats.includes(paddedSeatCode);
+
                               return (
                                 <div
                                   key={seatCode}
@@ -1627,7 +1635,6 @@ export default function MovieManagement() {
               )}
             </div>
 
-            {/* Close Trigger Action Footer */}
             <div className="mt-8 pt-4 border-t border-border flex justify-end">
               <button
                 onClick={() => setIsStatsModalOpen(false)}
@@ -1644,25 +1651,24 @@ export default function MovieManagement() {
       {isMovieModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-card border border-border w-full max-w-xl rounded-3xl p-6 shadow-xl relative text-foreground max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Film size={16} className="text-brand-lime" />
-                {editingMovie
-                  ? "Modify Existing Movie"
-                  : "Register Catalog Profile"}
-              </h3>
-              <button
-                onClick={() => setIsMovieModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleMovieSubmit} className="space-y-4">
+            <button
+              onClick={() => setIsMovieModalOpen(false)}
+              className="absolute right-4 top-4 p-2 rounded-xl bg-input border border-border text-muted-foreground hover:text-foreground transition-all"
+            >
+              <X size={14} />
+            </button>
+            <h3 className="text-base font-black tracking-tight mb-4">
+              {editingMovie
+                ? "Edit Catalog Item details"
+                : "Register New Cinematic Production"}
+            </h3>
+            <form
+              onSubmit={handleMovieSubmit}
+              className="space-y-4 text-xs font-medium"
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
                     Film Title
                   </label>
                   <input
@@ -1672,31 +1678,30 @@ export default function MovieManagement() {
                     onChange={(e) =>
                       setMovieForm({ ...movieForm, title: e.target.value })
                     }
-                    placeholder="e.g., Love in Kyoto"
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-semibold"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Genre Track
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Genre Trace
                   </label>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. Action / Sci-Fi"
                     value={movieForm.genre}
                     onChange={(e) =>
                       setMovieForm({ ...movieForm, genre: e.target.value })
                     }
-                    placeholder="e.g., Romance / Drama"
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Runtime (min)
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Runtime (Minutes)
                   </label>
                   <input
                     type="number"
@@ -1705,154 +1710,142 @@ export default function MovieManagement() {
                     onChange={(e) =>
                       setMovieForm({ ...movieForm, duration: e.target.value })
                     }
-                    placeholder="120"
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Language Track
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Track Language
                   </label>
                   <input
                     type="text"
-                    required
                     value={movieForm.language}
                     onChange={(e) =>
                       setMovieForm({ ...movieForm, language: e.target.value })
                     }
-                    placeholder="English"
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Release Date
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Status Track
                   </label>
-                  <input
-                    type="date"
-                    required
-                    value={movieForm.releaseDate}
+                  <select
+                    value={movieForm.status}
                     onChange={(e) =>
-                      setMovieForm({
-                        ...movieForm,
-                        releaseDate: e.target.value,
-                      })
+                      setMovieForm({ ...movieForm, status: e.target.value })
                     }
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
-                  />
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
+                  >
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Released">Released</option>
+                    <option value="Archived">Archived</option>
+                  </select>
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Description Brief
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Release Target Date
+                </label>
+                <input
+                  type="date"
+                  value={movieForm.releaseDate}
+                  onChange={(e) =>
+                    setMovieForm({ ...movieForm, releaseDate: e.target.value })
+                  }
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Poster Image Stream URL
+                </label>
+                <input
+                  type="text"
+                  value={movieForm.posterImage}
+                  onChange={(e) =>
+                    setMovieForm({ ...movieForm, posterImage: e.target.value })
+                  }
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Trailer Link
+                </label>
+                <input
+                  type="text"
+                  value={movieForm.trailerLink}
+                  onChange={(e) =>
+                    setMovieForm({ ...movieForm, trailerLink: e.target.value })
+                  }
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Production Log Synopsis
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={movieForm.description}
                   onChange={(e) =>
                     setMovieForm({ ...movieForm, description: e.target.value })
                   }
-                  placeholder="Provide explicit operational details regarding feature narrative indexes..."
-                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Poster Vector URI
-                  </label>
-                  <input
-                    type="url"
-                    value={movieForm.posterImage}
-                    onChange={(e) =>
-                      setMovieForm({
-                        ...movieForm,
-                        posterImage: e.target.value,
-                      })
-                    }
-                    placeholder="https://example.com/poster.jpg"
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                    Trailer Stream URL
-                  </label>
-                  <input
-                    type="url"
-                    value={movieForm.trailerLink}
-                    onChange={(e) =>
-                      setMovieForm({
-                        ...movieForm,
-                        trailerLink: e.target.value,
-                      })
-                    }
-                    placeholder="https://youtube.com/watch?..."
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Release Deployment Status
-                </label>
-                <select
-                  value={movieForm.status}
-                  onChange={(e) =>
-                    setMovieForm({ ...movieForm, status: e.target.value })
-                  }
-                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsMovieModalOpen(false)}
+                  className="px-4 py-2 bg-input border border-border rounded-xl text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <option value="Upcoming">Upcoming</option>
-                  <option value="Released">Released</option>
-                  <option value="NOW_SHOWING">Now Showing</option>
-                </select>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-brand-lime text-black font-black uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  Commit Log Entity
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="w-full mt-2 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
-              >
-                {editingMovie ? "Save Updates" : "Commit New Feature Track"}
-              </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- DIALOG MODAL B: PRODUCTION SHOWTIME SCHEDULER OVERLAY --- */}
+      {/* --- DIALOG MODAL B: SCREENING SLOT GENERATION ENGINE OVERLAY --- */}
       {isScreeningModalOpen && activeMovieForScreening && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-xl relative text-foreground">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Clock size={16} className="text-brand-lime" /> Program
-                Screening Slot
-              </h3>
-              <button
-                onClick={() => setIsScreeningModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="mb-4 bg-input/40 p-3 rounded-xl border border-border">
-              <span className="text-[9px] text-muted-foreground font-bold uppercase block tracking-wider">
-                Target Film Entity
-              </span>
-              <span className="text-xs font-black text-brand-lime">
+            <button
+              onClick={() => setIsScreeningModalOpen(false)}
+              className="absolute right-4 top-4 p-2 rounded-xl bg-input border border-border text-muted-foreground hover:text-foreground transition-all"
+            >
+              <X size={14} />
+            </button>
+            <h3 className="text-base font-black tracking-tight mb-1">
+              Program Showtime Matrix
+            </h3>
+            <p className="text-xs text-muted-foreground mb-4">
+              Adding screening window track metrics for:{" "}
+              <span className="font-bold text-foreground">
                 {activeMovieForScreening.title}
               </span>
-            </div>
-
-            <form onSubmit={handleScreeningSubmit} className="space-y-4">
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Auditorium Target Assignment
+            </p>
+            <form
+              onSubmit={handleScreeningSubmit}
+              className="space-y-4 text-xs font-medium"
+            >
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Target Screen Allocation Unit
                 </label>
                 <select
                   required
@@ -1863,22 +1856,20 @@ export default function MovieManagement() {
                       screenId: e.target.value,
                     })
                   }
-                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground"
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                 >
-                  <option value="" disabled>
-                    Select Target Theater Location
-                  </option>
-                  {screens.map((sc) => (
-                    <option key={sc.screen_id} value={sc.screen_id}>
-                      {sc.screen_name} ({sc.screen_type} - Cap: {sc.capacity})
+                  {screens.map((scr) => (
+                    <option key={scr.screen_id} value={scr.screen_id}>
+                      {scr.screen_name} ({scr.screen_type} - Cap: {scr.capacity}
+                      )
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-                  Calendar Projection Date
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Performance Target Date
                 </label>
                 <input
                   type="date"
@@ -1890,16 +1881,14 @@ export default function MovieManagement() {
                       showDate: e.target.value,
                     })
                   }
-                  className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                  className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                 />
               </div>
 
-              {/* Enhanced Grid with Custom Interactive Picker Implementations */}
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1 flex items-center gap-1">
-                    <Clock size={10} className="text-brand-lime" /> Start
-                    Runtime Clock
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Start Window Time
                   </label>
                   <input
                     type="time"
@@ -1911,13 +1900,12 @@ export default function MovieManagement() {
                         startTime: e.target.value,
                       })
                     }
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground block mb-1 flex items-center gap-1">
-                    <Clock size={10} className="text-red-400" /> End Expected
-                    Matrix
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Est. Clear Time
                   </label>
                   <input
                     type="time"
@@ -1929,44 +1917,59 @@ export default function MovieManagement() {
                         endTime: e.target.value,
                       })
                     }
-                    className="w-full bg-input border border-border text-xs rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-brand-lime text-foreground font-mono"
+                    className="w-full bg-input border border-border rounded-xl px-3 py-2.5 text-foreground focus:outline-none"
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full mt-4 py-3 bg-brand-lime text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all hover:opacity-90 shadow-sm"
-              >
-                Deploy Showtime Track
-              </button>
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsScreeningModalOpen(false)}
+                  className="px-4 py-2 bg-input border border-border rounded-xl text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-brand-lime text-black font-black uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  Publish Session Window
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- STANDALONE CUSTOM MODAL NOTIFICATION LAYER PORTAL --- */}
+      {/* --- CUSTOM POPUP NOTIFICATION MODAL WRAPPER LAYER --- */}
       {notification && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn select-none">
-          <div className="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-2xl text-foreground text-center space-y-4">
-            <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center">
-              {notification.type === "success" && (
-                <CheckCircle2 className="text-brand-lime w-10 h-10" />
-              )}
-              {notification.type === "error" && (
-                <AlertCircle className="text-red-500 w-10 h-10" />
-              )}
-              {notification.type === "confirm" && (
-                <Video className="text-amber-500 w-10 h-10" />
-              )}
-            </div>
-            <div>
-              <h4 className="text-sm font-black uppercase tracking-wider">
-                {notification.title}
-              </h4>
-              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                {notification.message}
-              </p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn select-none">
+          <div className="bg-card border border-border w-full max-w-sm rounded-2xl p-5 shadow-2xl text-foreground">
+            <div className="flex items-start gap-3 mb-3">
+              <div
+                className={`p-2 rounded-xl ${
+                  notification.type === "success"
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : notification.type === "error"
+                      ? "bg-red-500/10 text-red-400"
+                      : "bg-amber-500/10 text-amber-400"
+                }`}
+              >
+                {notification.type === "success" ? (
+                  <CheckCircle2 size={18} />
+                ) : (
+                  <AlertCircle size={18} />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-black tracking-tight">
+                  {notification.title}
+                </h4>
+                <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">
+                  {notification.message}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2 pt-2">
               {notification.type === "confirm" ? (
@@ -1976,13 +1979,13 @@ export default function MovieManagement() {
                       if (notification.onConfirm) notification.onConfirm();
                       closeNotice();
                     }}
-                    className="flex-1 py-2.5 bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-600 transition-colors"
+                    className="flex-1 py-2 bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-red-600 transition-colors"
                   >
                     Confirm Drop
                   </button>
                   <button
                     onClick={closeNotice}
-                    className="flex-1 py-2.5 bg-input border border-border text-muted-foreground font-bold text-xs uppercase tracking-wider rounded-xl hover:text-foreground transition-colors"
+                    className="flex-1 py-2 bg-input border border-border text-muted-foreground font-bold text-xs uppercase tracking-wider rounded-xl hover:text-foreground transition-colors"
                   >
                     Abort
                   </button>
@@ -1990,7 +1993,7 @@ export default function MovieManagement() {
               ) : (
                 <button
                   onClick={closeNotice}
-                  className="w-full py-2.5 bg-foreground text-background font-black text-xs uppercase tracking-widest rounded-xl hover:opacity-90 transition-all"
+                  className="w-full py-2 bg-foreground text-background font-black text-xs uppercase tracking-widest rounded-xl hover:opacity-90 transition-all"
                 >
                   Dismiss Context Alert
                 </button>
