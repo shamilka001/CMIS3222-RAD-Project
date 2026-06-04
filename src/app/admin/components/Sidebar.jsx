@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Users, Film, BarChart3, Settings, LogOut, Armchair } from "lucide-react"
+import { Users, Film, BarChart3, Settings, LogOut, Armchair, Ticket } from "lucide-react"
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const pathname = usePathname()
@@ -12,7 +12,8 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { id: 'overview', label: 'Overview', icon: BarChart3, type: 'tab' },
     { id: 'movies', label: 'Movies', icon: Film, type: 'tab' },
     { id: 'users', label: 'Users', icon: Users, type: 'tab' },
-    { id: 'seating', label: 'Seating', icon: Armchair, type: 'tab' }, // <-- Added right beneath Users
+    { id: 'seating', label: 'Seating', icon: Armchair, type: 'tab' },
+    { id: 'cashier', label: 'Cashier', icon: Ticket, type: 'tab' }, // <-- Added to Sidebar Array Matrix
     { id: 'settings', label: 'Settings', icon: Settings, type: 'link', path: '/admin/settings' },
   ]
 

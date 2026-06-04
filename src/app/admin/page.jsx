@@ -11,6 +11,7 @@ import ActivityAside from "@/app/admin/components/ActivityAside"
 import MovieManagement from "@/app/admin/components/MovieManagement"
 import UserManagement from "@/app/admin/components/UserManagement"
 import SeatingManagement from "@/app/admin/components/SeatingManagement"
+import CashierTerminal from "@/app/admin/components/CashierTerminal"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -54,6 +55,11 @@ export default function AdminDashboard() {
           {/* SECTION D: INTERACTIVE CINEMA AUDITORIUM LAYOUT SEATING MANAGER */}
           {activeTab === 'seating' && (
             <SeatingManagement />
+          )}
+
+          {/* SECTION E: ON-SITE CASHIER COUNTER POINT OF SALE TERMINAL */}
+          {activeTab === 'cashier' && ( // <-- MOUNT TERMINAL VIEWS CONTAINER
+            <CashierTerminal />
           )}
         </main>
 

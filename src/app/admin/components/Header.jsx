@@ -1,39 +1,18 @@
-// "use client"
-
-// import { Search } from "lucide-react"
-
-// export default function Header({ activeTab }) {
-//   return (
-//     <header className="bg-card text-card-foreground border border-border rounded-2xl p-4 flex justify-between items-center shadow-xs transition-colors duration-200">
-//       {/* Breadcrumb Navigation Trail */}
-//       <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-//         <span className="text-muted-foreground/60">Dashboards</span>
-//         <span className="text-muted-foreground/40">/</span>
-//         <span className="text-foreground font-black border-b-2 border-brand-lime pb-0.5">{activeTab}</span>
-//       </div>
-
-//       <div className="flex items-center gap-4">
-//         {/* Modern Styled Search Matrix */}
-//         <div className="relative">
-//           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={14} />
-//           <input
-//             type="text"
-//             placeholder="Quick search... (⌘K)"
-//             className="bg-input border border-border text-xs rounded-xl pl-9 pr-4 py-2 w-48 focus:outline-none focus:ring-1 focus:ring-brand-lime focus:border-brand-lime transition-all text-foreground placeholder:text-muted-foreground/50 font-medium"
-//           />
-//         </div>
-
-//       </div>
-//     </header>
-//   )
-// }
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Calendar, Clock, Film, Loader2 } from "lucide-react";
+import { Search, X, Calendar, Clock, Film, Loader2, Ticket } from "lucide-react";
 
-export default function Header({ activeTab }) {
+// Tab configurations dictionary mapping for scalable title text strings
+const TAB_LABELS = {
+  overview: 'Dashboard Overview',
+  movies: 'Movie Library Catalog',
+  users: 'System Profile Directory',
+  seating: 'Auditorium Grid Topologies',
+  cashier: 'On-Site Point of Sale Terminal'
+};
+
+export default function Header({ activeTab, setActiveTab }) {
   // Search and Suggestion dropdown states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -127,17 +106,27 @@ export default function Header({ activeTab }) {
 
   return (
     <>
-      <header className="bg-card text-card-foreground border border-border rounded-2xl p-4 flex justify-between items-center shadow-xs transition-colors duration-200 relative z-40">
-        {/* Breadcrumb Navigation Trail */}
-        <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-          <span className="text-muted-foreground/60">Dashboards</span>
-          <span className="text-muted-foreground/40">/</span>
-          <span className="text-foreground font-black border-b-2 border-brand-lime pb-0.5">
-            {activeTab}
-          </span>
+      <header className="no-print w-full bg-card text-card-foreground border border-border rounded-3xl p-4 flex justify-between items-center shadow-xs transition-colors duration-200 relative z-40">
+        
+        {/* Left Aligned Breadcrumb & Title Cluster */}
+        <div className="flex flex-col gap-1">
+          {/* Breadcrumb Navigation Trail */}
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+            <span className="text-muted-foreground/60">Dashboards</span>
+            <span className="text-muted-foreground/40">/</span>
+            <span className="text-foreground font-black border-b-2 border-brand-lime pb-0.5">
+              {activeTab}
+            </span>
+          </div>
+          {/* Main Contextual Dynamic Heading */}
+          <h1 className="text-sm font-black uppercase tracking-wider text-foreground mt-1">
+            {TAB_LABELS[activeTab] || 'Admin Console Cluster'}
+          </h1>
         </div>
 
+        {/* Right Aligned Quick Actions Tray */}
         <div className="flex items-center gap-4">
+          
           {/* Modern Styled Search Matrix (Expanded X-axis width) */}
           <div className="relative" ref={dropdownRef}>
             <Search
@@ -198,6 +187,18 @@ export default function Header({ activeTab }) {
               </div>
             )}
           </div>
+
+          {/* CASHIER QUICK TRIGGER BUTTON */}
+          <button
+            onClick={() => setActiveTab('cashier')}
+            className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 ${
+              activeTab === 'cashier'
+                ? 'bg-brand-lime text-black shadow-md shadow-brand-lime/10'
+                : 'bg-input hover:bg-foreground/[0.04] text-muted-foreground hover:text-foreground border border-border'
+            }`}
+          >
+            <Ticket size={14} /> Cashier
+          </button>
         </div>
       </header>
 
@@ -267,8 +268,7 @@ export default function Header({ activeTab }) {
               {/* Showtimes Processing Node */}
               <div className="border-t border-border pt-5">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-foreground mb-3 flex items-center gap-2">
-                  <Clock size={13} className="text-brand-lime" /> Available
-                  Screenings
+                  <Clock size={13} className="text-brand-lime" /> Available Screenings
                 </h3>
 
                 {isLoadingShowtimes ? (
@@ -299,8 +299,7 @@ export default function Header({ activeTab }) {
                           </div>
                         </div>
                         <div className="text-right font-mono bg-input border border-border px-2.5 py-1 rounded-lg text-xs font-semibold text-foreground group-hover:text-brand-lime transition-colors">
-                          {formatTime(show.start_time)} -{" "}
-                          {formatTime(show.end_time)}
+                          {formatTime(show.start_time)} - {formatTime(show.end_time)}
                         </div>
                       </div>
                     ))}
