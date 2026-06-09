@@ -32,10 +32,10 @@ export default function ChartsSection() {
           <div className="grid grid-cols-2 gap-3 text-xs">
             {/* Legend Nodes */}
             {[
-              { label: "Action", value: "$65,640", color: "bg-brand-lime" },
-              { label: "Sci-Fi", value: "$31,420", color: "bg-green-500" },
-              { label: "Drama", value: "$18,840", color: "bg-yellow-500" },
-              { label: "Thriller", value: "$4,120", color: "bg-purple-500" }
+              { label: "Action", value: "LKR 65,640", color: "bg-brand-lime" },
+              { label: "Sci-Fi", value: "LKR 31,420", color: "bg-green-500" },
+              { label: "Drama", value: "LKR 18,840", color: "bg-yellow-500" },
+              { label: "Thriller", value: "LKR 4,120", color: "bg-purple-500" }
             ].map((item, index) => (
               <div key={index}>
                 <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
