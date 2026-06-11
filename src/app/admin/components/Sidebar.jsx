@@ -87,7 +87,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Users,
   Film,
@@ -96,16 +96,17 @@ import {
   LogOut,
   Armchair,
   Ticket,
-  BrainCircuit, // <-- Imported for the AI Predictor icon
+  BrainCircuit,
 } from "lucide-react";
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Internal overview views
   const menuItems = [
     { id: "overview", label: "Overview", icon: BarChart3, type: "tab" },
-    { id: "predict", label: "AI Prediction", icon: BrainCircuit, type: "tab" }, // <-- Added your new AI tab here
+    { id: "predict", label: "AI Prediction", icon: BrainCircuit, type: "tab" },
     { id: "movies", label: "Movies", icon: Film, type: "tab" },
     { id: "users", label: "Users", icon: Users, type: "tab" },
     { id: "seating", label: "Seating", icon: Armchair, type: "tab" },
@@ -121,6 +122,16 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
   // Detect if the user is currently looking at the standalone settings path
   const isSettingsRoute = pathname === "/admin/settings";
+
+  // Functional log out sequence handler
+  const handleLogout = () => {
+    // 1. Wipe authorization and user context signatures from client context
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // 2. Redirect the routing scope to the baseline login terminal entry point
+    router.push("/login");
+  };
 
   return (
     <aside className="w-64 h-[95vh] sticky top-[2.5vh] ml-4 bg-[var(--sidebar)] text-[var(--sidebar-foreground)] border border-[var(--sidebar-border)] rounded-[3rem] flex flex-col p-6 z-50 transition-colors duration-200 shadow-xs">
@@ -194,7 +205,11 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </nav>
 
       {/* Logout Structural Trigger */}
-      <button className="flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/60 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 mt-auto">
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/60 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 mt-auto w-full text-left"
+      >
         <LogOut size={20} />
         <span className="text-sm font-bold uppercase tracking-widest">
           Logout

@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import React, { useState, useEffect, Suspense } from "react";
@@ -17,6 +18,9 @@
 
 //   const [movie, setMovie] = useState(null);
 //   const [loading, setLoading] = useState(true);
+
+//   // Showtime state
+//   const [showtimes, setShowtimes] = useState([]);
 
 //   // Review states
 //   const [reviews, setReviews] = useState([]);
@@ -49,10 +53,13 @@
 //   useEffect(() => {
 //     async function getMovieDetail() {
 //       try {
-//         const res = await fetch(`http://localhost:5000/film/${movieId}`, {
-//           cache: "no-store",
-//         });
+//         const [res, showtimesRes] = await Promise.all([
+//           fetch(`http://localhost:5000/film/${movieId}`, { cache: "no-store" }),
+//           fetch("http://localhost:5000/showtime/", { cache: "no-store" }),
+//         ]);
+
 //         const responseData = await res.json();
+//         const showtimesData = await showtimesRes.json();
 
 //         if (responseData && responseData.data) {
 //           const film = responseData.data;
@@ -63,10 +70,37 @@
 //             genre: film.genre || "Drama",
 //             description: film.description || "No description available.",
 //             poster: film.poster_image || "/images/posters/fallback.jpg",
-//             portrait: film.poster_image || "/images/posters/fallback.jpg", // Using poster as portrait if no separate portrait exists
+//             portrait: film.poster_image || "/images/posters/fallback.jpg",
 //             rating: "8.5",
 //             runtime: `${film.duration} min`,
 //           });
+
+//           // Match showtimes against the current film ID
+//           const fetchedShowtimes = showtimesData?.data || [];
+//           const matchingShowtimes = fetchedShowtimes
+//             .filter((st) => st.film_id === film.film_id)
+//             .map((st) => {
+//               const cleanDateString = st.show_date.split("T")[0];
+//               const cleanTimeString = st.start_time.substring(0, 5);
+//               const showtimeExpiryDate = new Date(
+//                 `${cleanDateString}T${cleanTimeString}:00`,
+//               );
+//               const isPast = showtimeExpiryDate < new Date();
+
+//               return {
+//                 showtimeId: st.showtime_id,
+//                 startTime: cleanTimeString,
+//                 endTime: st.end_time.substring(0, 5),
+//                 screenName: st.screen_name,
+//                 isPast: isPast,
+//                 date: new Date(st.show_date).toLocaleDateString("en-US", {
+//                   month: "short",
+//                   day: "numeric",
+//                 }),
+//               };
+//             });
+
+//           setShowtimes(matchingShowtimes);
 //         } else {
 //           throw new Error("Film item absent in backend");
 //         }
@@ -94,7 +128,6 @@
 //       fetchReviews();
 //     }
 
-//     // Decode token to find active session
 //     const token =
 //       typeof window !== "undefined" ? localStorage.getItem("token") : null;
 //     if (token) {
@@ -107,7 +140,6 @@
 //     }
 //   }, [movieId]);
 
-//   // Compute dynamic average rating from review data
 //   const avgRating =
 //     reviews.length > 0
 //       ? (
@@ -156,7 +188,7 @@
 //         setReviewSuccess("Review submitted successfully!");
 //         setNewDescription("");
 //         setNewRating(5);
-//         fetchReviews(); // Dynamic reload
+//         fetchReviews();
 //       } else {
 //         setReviewError(resData.message || "Failed to submit review.");
 //       }
@@ -168,8 +200,12 @@
 //     }
 //   };
 
-//   const handleGoToCinematic = () => {
-//     router.push(`/movie/${movieId}?mode=cinematic`);
+//   const handleGoToCinematic = (showtimeId) => {
+//     if (showtimeId) {
+//       router.push(`/movie/${movieId}?mode=cinematic&showtimeId=${showtimeId}`);
+//     } else {
+//       router.push(`/movie/${movieId}?mode=cinematic`);
+//     }
 //   };
 
 //   if (loading) {
@@ -195,7 +231,6 @@
 
 //   return (
 //     <div className="relative min-h-screen w-full bg-[#0a0b10] text-white overflow-y-auto">
-//       {/* Background Portrait Graphic */}
 //       <div className="fixed top-0 right-0 w-full lg:w-[70%] h-full z-0">
 //         <div className="absolute inset-0 bg-gradient-to-r from-[#0a0b10] via-[#0a0b10]/60 to-transparent z-10" />
 //         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0b10] via-transparent to-transparent z-10" />
@@ -259,16 +294,51 @@
 //             {movie.description}
 //           </motion.p>
 
-//           <div className="flex flex-wrap items-center gap-4 mb-20">
-//             <motion.button
-//               onClick={handleGoToCinematic}
-//               whileHover={{ scale: 1.05 }}
-//               whileTap={{ scale: 0.95 }}
-//               className="flex items-center gap-3 bg-cyan-500 text-black px-10 py-5 rounded-full font-black uppercase tracking-widest shadow-lg shadow-cyan-500/40"
-//             >
-//               Select Seats
-//             </motion.button>
+//           <div className="mb-10 max-w-xl">
+//             {showtimes && showtimes.length > 0 ? (
+//               <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3 backdrop-blur-md">
+//                 <p className="text-[10px] uppercase tracking-widest font-bold text-cyan-400">
+//                   Select a Showtime to Reserve Seats
+//                 </p>
+//                 <div className="flex flex-wrap gap-2.5">
+//                   {showtimes.map((st) => (
+//                     <button
+//                       key={st.showtimeId}
+//                       disabled={st.isPast}
+//                       onClick={() => handleGoToCinematic(st.showtimeId)}
+//                       className={`flex flex-col border rounded-lg px-3 py-2 text-center min-w-[75px] transition-all relative overflow-hidden ${
+//                         st.isPast
+//                           ? "bg-zinc-950/40 border-zinc-800/50 opacity-25 line-through cursor-not-allowed pointer-events-none select-none"
+//                           : "bg-black/40 border-white/5 hover:border-cyan-500/50 hover:bg-cyan-950/20 active:scale-95 cursor-pointer"
+//                       }`}
+//                     >
+//                       <span
+//                         className={`text-[9px] font-medium ${st.isPast ? "text-zinc-600" : "text-white/40"}`}
+//                       >
+//                         {st.date}
+//                       </span>
+//                       <span
+//                         className={`text-xs font-black mt-0.5 ${st.isPast ? "text-zinc-500" : "text-white"}`}
+//                       >
+//                         {st.startTime}
+//                       </span>
+//                       <span
+//                         className={`text-[8px] font-bold uppercase tracking-tight mt-0.5 truncate max-w-[70px] ${st.isPast ? "text-zinc-600" : "text-cyan-500/80"}`}
+//                       >
+//                         {st.screenName}
+//                       </span>
+//                     </button>
+//                   ))}
+//                 </div>
+//               </div>
+//             ) : (
+//               <div className="text-left font-bold tracking-wider text-red-400/90 bg-red-500/5 border border-red-500/10 p-4 rounded-2xl backdrop-blur-md text-xs uppercase">
+//                 ❌ No showtimes currently scheduled for this film.
+//               </div>
+//             )}
+//           </div>
 
+//           <div className="flex flex-wrap items-center gap-4 mb-20">
 //             <button className="px-10 py-5 rounded-full border border-white/20 font-bold hover:bg-white/10 transition-all">
 //               Watch Trailer
 //             </button>
@@ -281,7 +351,6 @@
 //             User <span className="text-cyan-500">Reviews</span>
 //           </h2>
 
-//           {/* Add Review Form */}
 //           {!currentUser ? (
 //             <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[2.5rem] mb-12 text-center">
 //               <div className="text-3xl mb-4">💬</div>
@@ -352,7 +421,6 @@
 //             </form>
 //           )}
 
-//           {/* Review List */}
 //           <div className="space-y-6">
 //             {fetchingReviews ? (
 //               <div className="text-center py-10 text-zinc-500 font-bold uppercase tracking-widest animate-pulse">
@@ -440,6 +508,8 @@
 //   );
 // }
 
+
+
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
@@ -448,6 +518,29 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import CinemaBooking from "@/components/booking/CinemaBooking";
 import { Footer } from "@/components/Footer";
+
+// Helper function to extract YouTube video ID from various URL formats
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    let videoId = null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      videoId = match[2];
+    } else {
+      // Fallback if it's just the ID provided in trailer_link
+      const urlObj = new URL(url);
+      videoId = urlObj.searchParams.get("v");
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  } catch (e) {
+    console.error("Error parsing trailer link:", e);
+    return null;
+  }
+}
 
 function MovieDetailContent() {
   const params = useParams();
@@ -472,6 +565,9 @@ function MovieDetailContent() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState("");
+
+  // Control state for showing the embedded player video modal
+  const [showTrailerModal, setShowTrailerModal] = useState(false);
 
   const fetchReviews = async () => {
     if (!movieId) return;
@@ -514,6 +610,7 @@ function MovieDetailContent() {
             portrait: film.poster_image || "/images/posters/fallback.jpg",
             rating: "8.5",
             runtime: `${film.duration} min`,
+            trailerLink: film.trailer_link || null, // Map the link from your API
           });
 
           // Match showtimes against the current film ID
@@ -558,6 +655,7 @@ function MovieDetailContent() {
             "An ex-hit-man comes out of retirement to track down the gangsters that killed his dog and took everything.",
           poster: "/images/posters/wick.jpg",
           portrait: "/images/posters/wickportrait.jpg",
+          trailerLink: null,
         });
       } finally {
         setLoading(false);
@@ -670,6 +768,8 @@ function MovieDetailContent() {
     );
   }
 
+  const embedUrl = getYouTubeEmbedUrl(movie.trailerLink);
+
   return (
     <div className="relative min-h-screen w-full bg-[#0a0b10] text-white overflow-y-auto">
       <div className="fixed top-0 right-0 w-full lg:w-[70%] h-full z-0">
@@ -780,11 +880,45 @@ function MovieDetailContent() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 mb-20">
-            <button className="px-10 py-5 rounded-full border border-white/20 font-bold hover:bg-white/10 transition-all">
-              Watch Trailer
-            </button>
+            {embedUrl ? (
+              <button
+                onClick={() => setShowTrailerModal(true)}
+                className="px-10 py-5 rounded-full border border-cyan-500/30 bg-cyan-950/20 text-cyan-400 font-bold hover:bg-cyan-500 hover:text-black transition-all shadow-lg shadow-cyan-500/10 active:scale-95"
+              >
+                ▶ Watch Trailer
+              </button>
+            ) : (
+              <button 
+                disabled
+                className="px-10 py-5 rounded-full border border-white/5 text-zinc-600 font-bold cursor-not-allowed opacity-50"
+              >
+                No Trailer Available
+              </button>
+            )}
           </div>
         </div>
+
+        {/* TRAILER MODAL LIGHTBOX OVERLAY */}
+        {showTrailerModal && embedUrl && (
+          <div className="fixed inset-0 z-[10000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 md:p-10">
+            <div className="absolute inset-0" onClick={() => setShowTrailerModal(false)} />
+            <div className="relative w-full max-w-5xl aspect-video bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-cyan-500/5 z-10">
+              <button
+                onClick={() => setShowTrailerModal(false)}
+                className="absolute -top-12 right-0 text-zinc-400 hover:text-white font-bold flex items-center gap-2 uppercase tracking-widest text-xs border border-white/10 bg-white/5 px-4 py-2 rounded-full"
+              >
+                ✕ Close
+              </button>
+              <iframe
+                src={`${embedUrl}?autoplay=1`}
+                title={`${movie.title} Official Trailer`}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
 
         {/* REVIEWS SECTION */}
         <section className="mt-20 mb-32 max-w-4xl">

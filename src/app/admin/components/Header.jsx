@@ -189,7 +189,7 @@ export default function Header({ activeTab, setActiveTab }) {
           </div>
 
           {/* CASHIER QUICK TRIGGER BUTTON */}
-          <button
+          {/* <button
             onClick={() => setActiveTab('cashier')}
             className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 ${
               activeTab === 'cashier'
@@ -198,7 +198,7 @@ export default function Header({ activeTab, setActiveTab }) {
             }`}
           >
             <Ticket size={14} /> Cashier
-          </button>
+          </button> */}
         </div>
       </header>
 
