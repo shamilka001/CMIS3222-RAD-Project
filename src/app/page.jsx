@@ -165,12 +165,7 @@ export default function UnifiedCinemaPage() {
 
       {/* MOBILE NAVIGATION */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] md:hidden">
-        <Navdok
-          onContactClick={triggerContactTransition}
-          onHomeClick={() => setView("home")}
-          onAboutClick={() => setView("about")}
-          onLoginClick={() => setView("login")}
-        />
+        
       </div>
 
       {/* PERSISTENT VIDEO BACKGROUND */}
