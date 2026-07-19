@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import React, { useState, useEffect } from "react";
@@ -24,11 +25,9 @@
 
 //       try {
 //         let userId;
-//         let userRole;
 //         try {
 //           const payload = JSON.parse(atob(token.split(".")[1]));
 //           userId = payload.id;
-//           userRole = payload.role;
 //         } catch (e) {
 //           throw new Error("token_malformed");
 //         }
@@ -36,7 +35,9 @@
 //         if (!userId) throw new Error("token_missing_id");
 
 //         // 1. Fetch User Profile Details
-//         const userRes = await authFetch(`http://localhost:5000/user/get-by-id/${userId}`);
+//         const userRes = await authFetch(
+//           `http://localhost:5000/user/get-by-id/${userId}`,
+//         );
 //         const contentType = userRes.headers.get("content-type");
 //         if (!contentType || !contentType.includes("application/json")) {
 //           throw new Error("server_error_not_json");
@@ -55,7 +56,6 @@
 //             id: userData.user_id,
 //           });
 //         } else {
-//           // FIXED: Safeguard string parameter extraction to prevent runtime call stack crash
 //           const fallbackMsg =
 //             responseData?.message ||
 //             responseData?.error ||
@@ -87,7 +87,6 @@
 //       } catch (err) {
 //         console.error("Profile fetch error caught cleanly:", err);
 
-//         // Map errors safely to state to display to the user without crashing the engine
 //         if (
 //           err.message === "token_malformed" ||
 //           err.message === "token_missing_id"
@@ -109,6 +108,21 @@
 
 //     fetchData();
 //   }, [router]);
+
+//   // --- SORT BOOKINGS CHRONOLOGICALLY DESCENDING (MOST RECENT FIRST) ---
+//   const sortedBookings = [...bookings].sort((a, b) => {
+//     // Attempt parsing by specific booking date dimensions
+//     const dateA = a.date ? new Date(a.date).getTime() : 0;
+//     const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+//     // If both dates map cleanly, perform numeric timestamp sorting evaluation
+//     if (dateA && dateB && dateA !== dateB) {
+//       return dateB - dateA;
+//     }
+
+//     // Fallback: If date string values are identical or unparseable, arrange by booking identifier descending
+//     return String(b.id || "").localeCompare(String(a.id || ""));
+//   });
 
 //   if (loading) {
 //     return (
@@ -204,9 +218,9 @@
 //                 </div>
 //               </div>
 
-//               <button className="w-full mt-12 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+//               {/* <button className="w-full mt-12 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
 //                 Edit Information
-//               </button>
+//               </button> */}
 //             </div>
 //           </div>
 
@@ -218,11 +232,11 @@
 //                   Booking History
 //                 </h2>
 //                 <span className="text-[10px] font-bold text-zinc-500 uppercase bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-md">
-//                   {bookings.length} Total Receipts
+//                   {sortedBookings.length} Total Receipts
 //                 </span>
 //               </div>
 
-//               {bookings.length === 0 ? (
+//               {sortedBookings.length === 0 ? (
 //                 <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
 //                   <div className="text-4xl mb-4">🎟️</div>
 //                   <p className="text-xs font-black uppercase tracking-widest">
@@ -237,7 +251,7 @@
 //                 </div>
 //               ) : (
 //                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-//                   {bookings.map((booking) => (
+//                   {sortedBookings.map((booking) => (
 //                     <div
 //                       key={booking.id || Math.random().toString()}
 //                       className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-all backdrop-blur-md"
@@ -260,7 +274,6 @@
 //                             {booking.movieTitle || "Unknown Feature Title"}
 //                           </p>
 //                           <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1">
-//                             {/* FIXED: Added a structural check on string split evaluations to avoid type crash errors */}
 //                             📅 {booking.date || "TBD"} • 🕒{" "}
 //                             {booking.time
 //                               ? booking.time.split(".")[0]
@@ -312,6 +325,11 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
 
 "use client";
 
@@ -401,12 +419,20 @@ export default function ProfilePage() {
       } catch (err) {
         console.error("Profile fetch error caught cleanly:", err);
 
+        const normalizedErrorMessage = err.message ? err.message.toLowerCase() : "";
+
+        // Frontend Interceptor Fix: Catches native malformed strings AND backend auth rejections
         if (
           err.message === "token_malformed" ||
-          err.message === "token_missing_id"
+          err.message === "token_missing_id" ||
+          normalizedErrorMessage.includes("expired") ||
+          normalizedErrorMessage.includes("invalid token") ||
+          normalizedErrorMessage.includes("unauthorized")
         ) {
           setError("Session expired or invalid. Please login again.");
           localStorage.removeItem("token");
+          // Dispatch event to update navbar/global states if necessary
+          window.dispatchEvent(new Event("auth-change"));
           router.push("/login");
         } else if (err.message === "server_error_not_json") {
           setError(
@@ -425,16 +451,13 @@ export default function ProfilePage() {
 
   // --- SORT BOOKINGS CHRONOLOGICALLY DESCENDING (MOST RECENT FIRST) ---
   const sortedBookings = [...bookings].sort((a, b) => {
-    // Attempt parsing by specific booking date dimensions
     const dateA = a.date ? new Date(a.date).getTime() : 0;
     const dateB = b.date ? new Date(b.date).getTime() : 0;
 
-    // If both dates map cleanly, perform numeric timestamp sorting evaluation
     if (dateA && dateB && dateA !== dateB) {
       return dateB - dateA;
     }
 
-    // Fallback: If date string values are identical or unparseable, arrange by booking identifier descending
     return String(b.id || "").localeCompare(String(a.id || ""));
   });
 
@@ -531,10 +554,6 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
-
-              {/* <button className="w-full mt-12 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-                Edit Information
-              </button> */}
             </div>
           </div>
 
