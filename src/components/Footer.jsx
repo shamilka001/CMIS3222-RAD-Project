@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -86,6 +87,7 @@ export function Footer() {
           <p className="text-[10px] sm:text-xs text-gray-500 italic font-medium">
             &copy; {currentYear} MaxX Lite Cinema.
           </p>
+          
         </div>
       </div>
     </footer>
