@@ -1,14 +1,15 @@
+
+
+
 "use client";
+
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Tickets from "./Tickets";
 
 export default function SeatSelector({
   seatCount,
   filmId: propFilmId,
   showtimeId: propShowtimeId,
-  selectedMovie: propSelectedMovie,
-  selectedShowtime: propSelectedShowtime,
 }) {
   const router = useRouter();
   const [seatsData, setSeatsData] = useState([]);
@@ -16,20 +17,11 @@ export default function SeatSelector({
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [resolvedFilmId, setResolvedFilmId] = useState(propFilmId || "");
   const [resolvedScreenId, setResolvedScreenId] = useState("");
-  
-  // Fully resolved objects to safely pass into Tickets component
-  const [resolvedShowtime, setResolvedShowtime] = useState(propSelectedShowtime || null);
-  const [resolvedMovie, setResolvedMovie] = useState(propSelectedMovie || null);
-
   const [initialLayoutLoading, setInitialLayoutLoading] = useState(true);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
-  // Printing State Layer using Tickets.jsx component
-  const [isPrinting, setIsPrinting] = useState(false);
-
-  // Error/Alert State Layer
+  // Error/Alert State Layer to notify unauthenticated users beautifully before redirecting
   const [authError, setAuthError] = useState(null);
-  
   // Checkout / Payment Transition State
   const [currentBookingId, setCurrentBookingId] = useState(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
@@ -43,73 +35,14 @@ export default function SeatSelector({
   const searchParams = useSearchParams();
   const showtimeId = propShowtimeId || searchParams.get("showtimeId");
 
-  // Handle afterprint event listener to redirect home once printing finishes
-  useEffect(() => {
-    const handleAfterPrint = () => {
-      setIsPrinting(false);
-      router.push("/");
-    };
-    window.addEventListener("afterprint", handleAfterPrint);
-    return () => window.removeEventListener("afterprint", handleAfterPrint);
-  }, [router]);
-
-  // Phase A: Resolve Showtime, Film, and Screen metadata dynamically if missing
-  useEffect(() => {
-    if (!showtimeId) {
-      if (propFilmId) setResolvedFilmId(propFilmId);
-      return;
-    }
-
-    async function autoResolveMetadata() {
-      try {
-        // 1. Fetch Showtime details
-        const showtimeRes = await fetch(
-          `http://127.0.0.1:5000/showtime/${showtimeId}`,
-        );
-        const showtimeJson = await showtimeRes.json();
-   
-        if (showtimeJson && showtimeJson.data) {
-          const showData = showtimeJson.data;
-          setResolvedShowtime(showData);
-
-          if (showData.film_id) {
-            setResolvedFilmId(showData.film_id);
-            
-            // 2. Fetch all films to match and populate selectedMovie object safely
-            try {
-              const filmRes = await fetch("http://127.0.0.1:5000/film/get-all-film");
-              const filmJson = await filmRes.json();
-              if (filmJson && filmJson.data) {
-                const matchedFilm = filmJson.data.find(
-                  (f) => String(f.film_id) === String(showData.film_id)
-                );
-                if (matchedFilm) {
-                  setResolvedMovie(matchedFilm);
-                }
-              }
-            } catch (filmErr) {
-              console.error("Failed fetching film catalog metadata:", filmErr);
-            }
-          }
-
-          if (showData.screen_id) {
-            setResolvedScreenId(showData.screen_id);
-          }
-        }
-      } catch (err) {
-        console.error("Failed auto-resolving layout metadata:", err);
-      }
-    }
-    autoResolveMetadata();
-  }, [propFilmId, showtimeId]);
-
-  // Phase B: Fetch Seating Grid Configuration Map matching the related screen layout uniquely
+  // Phase A: Fetch Seating Grid Configuration Map matching the related screen layout uniquely
   useEffect(() => {
     if (!resolvedScreenId) return;
 
     async function fetchScreenSpecificLayout() {
       try {
         setInitialLayoutLoading(true);
+        // Corrected endpoint from /screen/${id} to match backend log /seat/screen/${id}
         const response = await fetch(
           `http://127.0.0.1:5000/seat/screen/${resolvedScreenId}`,
         );
@@ -125,6 +58,35 @@ export default function SeatSelector({
     }
     fetchScreenSpecificLayout();
   }, [resolvedScreenId]);
+
+  // Phase B: Resolve Film ID & Screen ID dynamically from the showtime details
+  useEffect(() => {
+    if (!showtimeId) {
+      if (propFilmId) setResolvedFilmId(propFilmId);
+      return;
+    }
+
+    async function autoResolveMovieMeta() {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/showtime/${showtimeId}`,
+        );
+        const result = await response.json();
+   
+        if (result && result.data) {
+          if (result.data.film_id) {
+            setResolvedFilmId(result.data.film_id);
+          }
+          if (result.data.screen_id) {
+            setResolvedScreenId(result.data.screen_id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed auto-resolving layout metadata:", err);
+      }
+    }
+    autoResolveMovieMeta();
+  }, [propFilmId, showtimeId]);
 
   // Phase C: Fetch Seating Occupancy Map Matrix
   useEffect(() => {
@@ -214,7 +176,6 @@ export default function SeatSelector({
       showtimeId: String(showtimeId),
       seats: formattedSeatLabels,
     };
-    
     try {
       const response = await fetch("http://127.0.0.1:5000/booking/save", {
         method: "POST",
@@ -255,6 +216,142 @@ export default function SeatSelector({
     }
   }
 
+
+
+
+  
+ // Dynamic PDF Generator function - Fixed overlapping layout
+// Dynamic PDF Generator function - Matched to Dark/Cinematic UI Style
+  async function generateAndDownloadTicketPDF(bookingId, seats, totalCost) {
+    try {
+      // Dynamically import jsPDF so it only runs on the client-side
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a6", // A6 pocket-ticket size: 105mm x 148mm
+      });
+
+      // UI Match Colors (Tailwind equivalents)
+      const cyan = [6, 182, 212];        // text-cyan-500
+      const baseBg = [9, 9, 11];         // bg-zinc-950
+      const cardBg = [24, 24, 27];       // bg-zinc-900
+      const borderMuted = [39, 39, 42];  // border-zinc-800
+      const textMuted = [161, 161, 170]; // text-zinc-400
+      const white = [255, 255, 255];     // text-white
+
+      // 1. Full Dark Background
+      doc.setFillColor(...baseBg);
+      doc.rect(0, 0, 105, 148, "F");
+
+      // 2. Cyan "Neon" Outer Border
+      doc.setDrawColor(...cyan);
+      doc.setLineWidth(0.5);
+      doc.rect(4, 4, 97, 140);
+
+      // 3. Header Banner
+      doc.setFillColor(...cardBg);
+      doc.rect(5, 5, 95, 25, "F");
+
+      // Header Text
+      doc.setTextColor(...white);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("CINEMA NET TICKETS", 52.5, 15, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...cyan);
+      doc.text("SECURE BOOKING CONFIRMATION", 52.5, 22, { align: "center" });
+
+      // Divider Line
+      doc.setDrawColor(...borderMuted);
+      doc.setLineWidth(0.5);
+      doc.line(10, 36, 95, 36);
+
+      // Metadata Info Block (Using Courier to mimic font-mono class)
+      // 1. Booking Ref
+      doc.setTextColor(...textMuted);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.text("BOOKING REF", 10, 43);
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...white);
+      doc.text(String(bookingId), 10, 48);
+
+      // 2. Film ID
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...textMuted);
+      doc.text("FILM ID", 10, 56);
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...white);
+      doc.text(String(resolvedFilmId), 10, 61);
+
+      // 3. Showtime ID
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...textMuted);
+      doc.text("SHOWTIME ID", 10, 69);
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...white);
+      doc.text(String(showtimeId), 10, 74);
+
+      // Seats Info Block (Dark highlighted box matching UI)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...textMuted);
+      doc.text("CLAIMED SEATS:", 10, 88);
+      
+      doc.setFillColor(...cardBg);
+      doc.setDrawColor(...borderMuted);
+      doc.rect(10, 92, 85, 12, "FD"); // Fill and Draw
+      
+      doc.setTextColor(...cyan);
+      doc.setFont("courier", "bold");
+      doc.setFontSize(12);
+      doc.text(seats.join(", "), 52.5, 100, { align: "center" });
+
+      // Reset Fonts for Payment Info
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...textMuted);
+      doc.text("PAYMENT METHOD:", 10, 112);
+      
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...white);
+      doc.text("CREDIT CARD", 45, 112);
+
+      // Divider Line
+      doc.setDrawColor(...borderMuted);
+      doc.line(10, 118, 95, 118);
+
+      // Total Price Block
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...white);
+      doc.text("TOTAL AMOUNT PAID:", 10, 128);
+      
+      doc.setTextColor(...cyan);
+      doc.text(`$${totalCost}`, 95, 128, { align: "right" });
+
+      // Footer
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7);
+      doc.setTextColor(113, 113, 122); // text-zinc-500
+      doc.text("Please bring a digital copy of this ticket to the screen gateway.", 52.5, 138, { align: "center" });
+      doc.text("Thank you for choosing Cinema Net!", 52.5, 142, { align: "center" });
+
+      // Auto Download PDF
+      doc.save(`Ticket_Booking_${bookingId}.pdf`);
+    } catch (pdfError) {
+      console.error("Error building PDF layout stream:", pdfError);
+    }
+  }
   // Handle Mock Payment Form Submission
   async function handleMockPaymentSubmit(e) {
     e.preventDefault();
@@ -267,7 +364,6 @@ export default function SeatSelector({
       amount: ticketCost,
       paymentMethod: "CARD",
     };
-    
     try {
       const response = await fetch("http://127.0.0.1:5000/payment/", {
         method: "POST",
@@ -280,16 +376,22 @@ export default function SeatSelector({
       const result = await response.json();
 
       if (response.ok) {
-        const formattedSeatLabels = selectedSeats.map((s) => `${s.row_label}${s.seat_number}`);
+        alert(
+          "Transaction complete! Your seats have been claimed successfully. Downloading your ticket PDF...",
+        );
+        
+        // Capture seat labels before local states clear
+        const formattedSeatLabels = selectedSeats.map(
+          (s) => `${s.row_label}${s.seat_number}`,
+        );
+        const computedTotal = (selectedSeats.length * 1000).toFixed(2);
+
+        // TRIGGER AUTOMATIC TICKET DOWNLOAD HERE
+        await generateAndDownloadTicketPDF(currentBookingId, formattedSeatLabels, computedTotal);
+
         setBookedSeats((prev) => [...prev, ...formattedSeatLabels]);
-        
-        alert("Payment successful! Preparing your ticket print view.");
-        
-        // Trigger Tickets.jsx print view safely with fully resolved objects
-        setIsPrinting(true);
-        setTimeout(() => {
-          window.print();
-        }, 250);
+        setSelectedSeats([]);
+        setCurrentBookingId(null);
       } else {
         alert(`Payment error: ${result.message}`);
       }
@@ -302,22 +404,6 @@ export default function SeatSelector({
   }
 
   const isComplete = selectedSeats.length === seatCount;
-
-  // Render isolated printing component using Tickets.jsx when print state is active
-  if (
-    isPrinting &&
-    selectedSeats.length > 0
-  ) {
-    return (
-      <Tickets
-        selectedMovie={resolvedMovie}
-        selectedShowtime={resolvedShowtime}
-        selectedSeats={selectedSeats}
-      />
-    );
-  }
-
-  // 1. Loading State
   if (initialLayoutLoading) {
     return (
       <div className="text-white text-center p-10 font-medium tracking-wider animate-pulse">
@@ -326,7 +412,6 @@ export default function SeatSelector({
     );
   }
 
-  // 2. Error/Auth State
   if (authError) {
     return (
       <div className="w-full max-w-md mx-auto p-8 bg-zinc-950/80 border border-red-500/30 backdrop-blur-xl rounded-[40px] text-center shadow-2xl animate-fade-in my-12">
@@ -347,11 +432,10 @@ export default function SeatSelector({
     );
   }
 
-  // 3. Checkout / Payment State
   if (currentBookingId) {
     const computedTotal = (selectedSeats.length * 12.5).toFixed(2);
     return (
-      <div className="w-full max-w-md mx-auto p-8 bg-black/60 backdrop-blur-xl rounded-[40px] border border-white/10 text-white shadow-2xl animate-in fade-in zoom-in duration-500">
+      <div className="w-full max-w-md mx-auto p-8 bg-black/60 backdrop-blur-xl rounded-[40px] border border-white/10 text-white shadow-2xl">
         <div className="mb-6">
           <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest block mb-1">
             Checkout Process
@@ -498,7 +582,7 @@ export default function SeatSelector({
               disabled={paymentProcessing}
               className="w-2/3 bg-cyan-500 text-black font-black py-4 rounded-xl text-xs transition-all tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:bg-cyan-400 disabled:opacity-40"
             >
-              {paymentProcessing ? "PROCESSING..." : "AUTHORIZE CHARGE"}
+              {paymentProcessing ? "PROCESSING PAYMENT..." : "AUTHORIZE CHARGE"}
             </button>
           </div>
         </form>
@@ -506,7 +590,6 @@ export default function SeatSelector({
     );
   }
 
-  // 4. Default Seat Selection State
   return (
     <div className="flex flex-col items-center relative">
       <div className="w-full max-w-xl mb-12">
@@ -518,7 +601,8 @@ export default function SeatSelector({
 
       <div className="flex flex-wrap gap-6 justify-center mb-8 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-white/10 rounded-t-md border-t border-white/20" /> Available
+          <div className="w-4 h-4 bg-white/10 rounded-t-md border-t border-white/20" />{" "}
+          Available
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-cyan-500 rounded-t-md" /> Selected
@@ -526,12 +610,14 @@ export default function SeatSelector({
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-950/40 border border-red-900/40 text-red-500 rounded-t-md flex items-center justify-center text-[9px]">
             ✕
-          </div> Occupied
+          </div>{" "}
+          Occupied
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-zinc-900 border border-zinc-800 text-zinc-500 rounded-t-md flex items-center justify-center text-[9px]">
             🛠
-          </div> Damaged
+          </div>{" "}
+          Damaged
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { HeroParallax } from "@/components/Hero";
+import TestimonialsSection from "@/components/Testimonials";
 import { motion } from "framer-motion";
 
 export default function AboutPage() {
@@ -72,6 +73,7 @@ export default function AboutPage() {
              </motion.div>
            ))}
         </div>
+        
       </section>
 
       <Footer />

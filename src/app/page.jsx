@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import MovieCard from "../components/MovieCard";
 import Navbar from "../components/Navbar";
 import Navdok from "../components/Navdok";
+import Testimonials from "../components/Testimonials";
 import { CinemaMap } from "../components/CinemaMap";
 import LoginPage from "./login/page";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
