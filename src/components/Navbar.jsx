@@ -109,18 +109,21 @@ export default function Navbar({
             Home
           </button>
 
-          <button
-            onClick={handleAboutClick}
-            className="text-xs font-black uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors outline-none cursor-pointer"
-          >
-            About
-          </button>
+          
 
           <button
             onClick={handleContactClick}
             className="text-xs font-black uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors outline-none cursor-pointer"
           >
             Contact
+          </button>
+
+
+          <button
+            onClick={handleAboutClick}
+            className="text-xs font-black uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors outline-none cursor-pointer"
+          >
+            About
           </button>
         </div>
 
@@ -180,17 +183,18 @@ export default function Navbar({
                 Home
               </button>
               <button
-                onClick={handleAboutClick}
-                className="text-zinc-400 hover:text-cyan-400 py-3 border-b border-white/5 transition-colors cursor-pointer"
-              >
-                About
-              </button>
-              <button
                 onClick={handleContactClick}
                 className="text-zinc-400 hover:text-cyan-400 py-3 border-b border-white/5 transition-colors cursor-pointer"
               >
                 Contact
               </button>
+              <button
+                onClick={handleAboutClick}
+                className="text-zinc-400 hover:text-cyan-400 py-3 border-b border-white/5 transition-colors cursor-pointer"
+              >
+                About
+              </button>
+              
 
               {/* Responsive Contextual Auth Button Block */}
               <div className="pt-6">

@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { CanvasLoader } from "./CanvasLoader"; // <-- 1. Import CanvasLoader
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,9 +71,6 @@ export function HeroParallax({ title, subtitle, detailsTitle, detailsDesc, depth
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
         }}
       >
-        {/* TOP LAYER (z-50): Covers full screen until 3D textures finish loading */}
-        <CanvasLoader />
-
         {/* LAYER 1: BACKGROUND */}
         <div ref={bgRef} className="absolute inset-0 z-0 h-[130%] w-full top-[-15%] pointer-events-none">
           <Image 
@@ -109,7 +105,7 @@ export function HeroParallax({ title, subtitle, detailsTitle, detailsDesc, depth
           <h1 className="text-7xl md:text-[10rem] font-black uppercase italic tracking-tighter text-white drop-shadow-2xl leading-[0.8]">
             {title || <>Max<span className="text-red-500">Lite</span></>}
           </h1>
-          <p className=" text-white drop-shadow-2xl font-bold tracking-[1em] uppercase text-md mt-8">
+          <p className="text-gray-400 font-bold tracking-[0.5em] uppercase text-sm mt-8">
             {subtitle || "Unreal Depth"}
           </p>
         </div>
@@ -122,7 +118,7 @@ export function HeroParallax({ title, subtitle, detailsTitle, detailsDesc, depth
           <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white mb-6 max-w-4xl leading-tight">
             {detailsTitle || "Cinema Reimagined for the Modern Age"}
           </h2>
-          <p className="text-red-500 font-black tracking-[0.4em] uppercase text-xs md:text-sm max-w-2xl">
+          <p className="text-cyan-500 font-black tracking-[0.4em] uppercase text-xs md:text-sm max-w-2xl">
             {detailsDesc || "Experience movies in stunning 4K with Dolby Atmos sound in the heart of Moratuwa."}
           </p>
         </div>
