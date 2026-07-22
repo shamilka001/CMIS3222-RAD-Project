@@ -1,4 +1,9 @@
 
+
+
+
+
+
 // "use client";
 
 // import React, { useState, useEffect } from "react";
@@ -87,12 +92,20 @@
 //       } catch (err) {
 //         console.error("Profile fetch error caught cleanly:", err);
 
+//         const normalizedErrorMessage = err.message ? err.message.toLowerCase() : "";
+
+//         // Frontend Interceptor Fix: Catches native malformed strings AND backend auth rejections
 //         if (
 //           err.message === "token_malformed" ||
-//           err.message === "token_missing_id"
+//           err.message === "token_missing_id" ||
+//           normalizedErrorMessage.includes("expired") ||
+//           normalizedErrorMessage.includes("invalid token") ||
+//           normalizedErrorMessage.includes("unauthorized")
 //         ) {
 //           setError("Session expired or invalid. Please login again.");
 //           localStorage.removeItem("token");
+//           // Dispatch event to update navbar/global states if necessary
+//           window.dispatchEvent(new Event("auth-change"));
 //           router.push("/login");
 //         } else if (err.message === "server_error_not_json") {
 //           setError(
@@ -111,16 +124,13 @@
 
 //   // --- SORT BOOKINGS CHRONOLOGICALLY DESCENDING (MOST RECENT FIRST) ---
 //   const sortedBookings = [...bookings].sort((a, b) => {
-//     // Attempt parsing by specific booking date dimensions
 //     const dateA = a.date ? new Date(a.date).getTime() : 0;
 //     const dateB = b.date ? new Date(b.date).getTime() : 0;
 
-//     // If both dates map cleanly, perform numeric timestamp sorting evaluation
 //     if (dateA && dateB && dateA !== dateB) {
 //       return dateB - dateA;
 //     }
 
-//     // Fallback: If date string values are identical or unparseable, arrange by booking identifier descending
 //     return String(b.id || "").localeCompare(String(a.id || ""));
 //   });
 
@@ -217,10 +227,6 @@
 //                   </span>
 //                 </div>
 //               </div>
-
-//               {/* <button className="w-full mt-12 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-//                 Edit Information
-//               </button> */}
 //             </div>
 //           </div>
 
@@ -330,7 +336,6 @@
 
 
 
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -347,6 +352,12 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("auth-change"));
+    router.push("/login");
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
@@ -360,7 +371,13 @@ export default function ProfilePage() {
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
           userId = payload.id;
+
+          // --- CHECK CLIENT-SIDE EXPIRATION ---
+          if (payload.exp && payload.exp * 1000 < Date.now()) {
+            throw new Error("token_expired");
+          }
         } catch (e) {
+          if (e.message === "token_expired") throw e;
           throw new Error("token_malformed");
         }
 
@@ -368,8 +385,13 @@ export default function ProfilePage() {
 
         // 1. Fetch User Profile Details
         const userRes = await authFetch(
-          `http://localhost:5000/user/get-by-id/${userId}`,
+          `http://localhost:5000/user/get-by-id/${userId}`
         );
+
+        if (userRes.status === 401 || userRes.status === 403) {
+          throw new Error("token_expired");
+        }
+
         const contentType = userRes.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("server_error_not_json");
@@ -377,7 +399,7 @@ export default function ProfilePage() {
 
         const responseData = await userRes.json();
 
-        if (userRes.ok && responseData && responseData.data) {
+        if (userRes.ok && responseData?.data) {
           const userData = responseData.data;
           setUser({
             firstName: userData.first_name || "",
@@ -388,16 +410,16 @@ export default function ProfilePage() {
             id: userData.user_id,
           });
         } else {
-          const fallbackMsg =
+          throw new Error(
             responseData?.message ||
-            responseData?.error ||
-            "Failed to load profile configuration metrics.";
-          throw new Error(fallbackMsg);
+              responseData?.error ||
+              "Failed to load profile details."
+          );
         }
 
         // 2. Fetch User Purchased Booking History
         const bookingRes = await authFetch(
-          `http://localhost:5000/user/booking/${userId}`,
+          `http://localhost:5000/user/booking/${userId}`
         );
         const bContentType = bookingRes.headers.get("content-type");
 
@@ -407,39 +429,37 @@ export default function ProfilePage() {
           bContentType.includes("application/json")
         ) {
           const bookingResult = await bookingRes.json();
-
-          if (bookingResult && bookingResult.data) {
-            setBookings(
-              Array.isArray(bookingResult.data) ? bookingResult.data : [],
-            );
-          } else {
-            setBookings(Array.isArray(bookingResult) ? bookingResult : []);
-          }
+          setBookings(
+            Array.isArray(bookingResult?.data)
+              ? bookingResult.data
+              : Array.isArray(bookingResult)
+              ? bookingResult
+              : []
+          );
         }
       } catch (err) {
-        console.error("Profile fetch error caught cleanly:", err);
+        console.warn("Auth handling caught session state:", err.message);
 
-        const normalizedErrorMessage = err.message ? err.message.toLowerCase() : "";
+        const normalizedErrorMessage = err.message
+          ? err.message.toLowerCase()
+          : "";
 
-        // Frontend Interceptor Fix: Catches native malformed strings AND backend auth rejections
+        // Catch expired token, unauthorized responses, or malformed strings
         if (
+          err.message === "token_expired" ||
           err.message === "token_malformed" ||
           err.message === "token_missing_id" ||
           normalizedErrorMessage.includes("expired") ||
           normalizedErrorMessage.includes("invalid token") ||
           normalizedErrorMessage.includes("unauthorized")
         ) {
-          setError("Session expired or invalid. Please login again.");
-          localStorage.removeItem("token");
-          // Dispatch event to update navbar/global states if necessary
-          window.dispatchEvent(new Event("auth-change"));
-          router.push("/login");
+          handleLogout();
         } else if (err.message === "server_error_not_json") {
           setError(
-            "The server returned an invalid response format. Please contact engineering support.",
+            "The server returned an invalid response format. Please contact support."
           );
         } else {
-          setError(err.message || "Unable to load account dataset metrics.");
+          setError(err.message || "Unable to load account dataset.");
         }
       } finally {
         setLoading(false);
@@ -449,7 +469,7 @@ export default function ProfilePage() {
     fetchData();
   }, [router]);
 
-  // --- SORT BOOKINGS CHRONOLOGICALLY DESCENDING (MOST RECENT FIRST) ---
+  // --- SORT BOOKINGS CHRONOLOGICALLY DESCENDING ---
   const sortedBookings = [...bookings].sort((a, b) => {
     const dateA = a.date ? new Date(a.date).getTime() : 0;
     const dateB = b.date ? new Date(b.date).getTime() : 0;
@@ -482,7 +502,6 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-6xl mx-auto px-6 pt-32 pb-20"
       >
-        {/* Header Block Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div>
             <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none mb-4">
@@ -493,11 +512,7 @@ export default function ProfilePage() {
             </p>
           </div>
           <button
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.dispatchEvent(new Event("auth-change"));
-              router.push("/login");
-            }}
+            onClick={handleLogout}
             className="px-8 py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs font-black uppercase tracking-widest hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 transition-all self-start"
           >
             Secure Logout
@@ -511,7 +526,6 @@ export default function ProfilePage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Sidebar Info Card */}
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-32">
             <div className="bg-zinc-950/50 border border-zinc-800/50 p-8 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
               <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 mb-8">
@@ -557,7 +571,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Main History Display Area */}
           <div className="lg:col-span-8">
             <div className="bg-zinc-950/50 border border-zinc-800/50 p-8 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
               <div className="flex items-center justify-between mb-8">

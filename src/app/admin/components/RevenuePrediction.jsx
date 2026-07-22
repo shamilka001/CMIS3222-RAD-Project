@@ -351,54 +351,295 @@
 
 
 
+// "use client";
+
+// import { useState } from "react";
+// import {
+//   BarChart, Bar, LineChart, Line, XAxis, YAxis, 
+//   CartesianGrid, Tooltip, Legend, ResponsiveContainer
+// } from "recharts";
+
+// const GENRE_MAPPING = [
+//   { name: "Action", encoded: 0 }, { name: "Comedy", encoded: 1 },
+//   { name: "Drama", encoded: 2 },  { name: "Horror", encoded: 3 },
+//   { name: "Sci-Fi", encoded: 4 }
+// ];
+
+// const AVAILABLE_TIMES = [
+//   { label: "10 AM", value: 10 }, { label: "12 PM", value: 12 },
+//   { label: "2 PM", value: 14 },  { label: "4 PM", value: 16 },
+//   { label: "6 PM", value: 18 },  { label: "7 PM", value: 19 }
+// ];
+
+// export default function RevenuePrediction() {
+//   // Shared Configuration States
+//   const [genreEncoded, setGenreEncoded] = useState(0);
+//   const [ticketPrice, setTicketPrice] = useState(15);
+//   const [capacity, setCapacity] = useState(200);
+  
+//   // Model A Specific Layout Variables (Revenue Predictions)
+//   const [selectedTimes, setSelectedTimes] = useState([]);
+//   const [day, setDay] = useState(5);
+//   const [quarter, setQuarter] = useState(3);
+//   const [revenueData, setRevenueData] = useState([]);
+
+//   // Model B Specific Layout Variables (Target Audience Demographic Mapping)
+//   const [targetAge, setTargetAge] = useState(25);
+//   const [groupSize, setGroupSize] = useState(1);
+//   const [seatType, setSeatType] = useState(1); // Stand-in index representation
+//   const [audienceResult, setAudienceResult] = useState(null);
+
+//   // Global System App states
+//   const [loadingRevenue, setLoadingRevenue] = useState(false);
+//   const [loadingAudience, setLoadingAudience] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   const handleTimeChange = (timeValue) => {
+//     setSelectedTimes(prev => prev.includes(timeValue) ? prev.filter((t) => t !== timeValue) : [...prev, timeValue]);
+//   };
+
+//   // Pipeline Method A: Fetch Revenue Metrics
+//   const runRevenueForecast = async (e) => {
+//     e.preventDefault();
+//     setLoadingRevenue(true);
+//     setError(null);
+//     try {
+//       const res = await fetch("http://127.0.0.1:8090/predict-revenue", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ genre_encoded: genreEncoded, times: selectedTimes, day, ticket_price: ticketPrice, capacity, quarter }),
+//       });
+//       const result = await res.json();
+//       if (!res.ok) throw new Error(result.message);
+//       setRevenueData(result.predictions.sort((a, b) => a.show_time_raw - b.show_time_raw));
+//     } catch (err) { setError(err.message); }
+//     finally { setLoadingRevenue(false); }
+//   };
+
+//   // Pipeline Method B: Fetch Demographic Segment Targeting Group Rules
+//   const runAudienceForecast = async (e) => {
+//     e.preventDefault();
+//     setLoadingAudience(true);
+//     setError(null);
+//     try {
+//       const res = await fetch("http://127.0.0.1:8090/predict-audience", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ age: targetAge, ticket_price: ticketPrice, group_size: groupSize, seat_type: seatType }),
+//       });
+//       const result = await res.json();
+//       if (!res.ok) throw new Error(result.message);
+//       setAudienceResult(result.target_audience_genre);
+//     } catch (err) { setError(err.message); }
+//     finally { setLoadingAudience(false); }
+//   };
+
+//   return (
+//     <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-8 max-w-7xl mx-auto text-slate-100 font-sans">
+//       <div>
+//         <h2 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Isolated Multi-Model Forecast Hub</h2>
+//         <p className="text-xs text-slate-400">Trigger targeted inference procedures against individual trained machine configurations separately.</p>
+//       </div>
+
+//       {error && <div className="text-red-400 bg-red-950/30 p-3 rounded-xl border border-red-900/50 text-xs"><strong>Error Framework Signal:</strong> {error}</div>}
+
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+//         {/* PANEL 1: REVENUE FLOW CONFIGURATION FORM */}
+//         <form onSubmit={runRevenueForecast} className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-xl space-y-4 flex flex-col justify-between">
+//           <div className="space-y-4">
+//             <div className="border-b border-slate-800 pb-2">
+//               <span className="text-[10px] uppercase tracking-widest font-bold text-blue-400">Pipeline Engine A</span>
+//               <h3 className="text-sm font-bold text-slate-200">Revenue Volume Estimation Model</h3>
+//             </div>
+            
+//             <div className="grid grid-cols-2 gap-3">
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Film Genre Base</label>
+//                 <select value={genreEncoded} onChange={(e) => setGenreEncoded(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none">
+//                   {GENRE_MAPPING.map((g) => <option key={g.encoded} value={g.encoded}>{g.name}</option>)}
+//                 </select>
+//               </div>
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Ticket Price</label>
+//                 <input type="number" step="0.1" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+//               </div>
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Hall Capacity</label>
+//                 <input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+//               </div>
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Day Vector (0-6)</label>
+//                 <input type="number" min="0" max="6" value={day} onChange={(e) => setDay(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+//               </div>
+//             </div>
+
+//             <div>
+//               <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Select Target Showtimes</label>
+//               <div className="flex flex-wrap gap-1.5 p-2 border border-slate-800 rounded-lg bg-slate-950">
+//                 {AVAILABLE_TIMES.map((t) => (
+//                   <label key={t.value} className={`px-2.5 py-1 rounded text-[11px] font-medium cursor-pointer transition-all ${selectedTimes.includes(t.value) ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}>
+//                     <input type="checkbox" checked={selectedTimes.includes(t.value)} onChange={() => handleTimeChange(t.value)} className="hidden" />
+//                     {t.label}
+//                   </label>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+
+//           <button type="submit" disabled={loadingRevenue || selectedTimes.length === 0} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 rounded-lg disabled:opacity-40 transition-colors mt-4">
+//             {loadingRevenue ? "Running Revenue Matrix..." : "Calculate Revenue Performance"}
+//           </button>
+//         </form>
+
+//         {/* PANEL 2: AUDIENCE GENRE CLASSIFICATION FORM */}
+//         <form onSubmit={runAudienceForecast} className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-xl space-y-4 flex flex-col justify-between">
+//           <div className="space-y-4">
+//             <div className="border-b border-slate-800 pb-2">
+//               <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-400">Pipeline Engine B</span>
+//               <h3 className="text-sm font-bold text-slate-200">Genre Target Audience Forecaster</h3>
+//             </div>
+
+//             <div className="grid grid-cols-2 gap-3">
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Age Group</label>
+//                 <input type="number" value={targetAge} onChange={(e) => setTargetAge(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+//               </div>
+//               <div>
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Group Size Array</label>
+//                 <input type="number" min="1" value={groupSize} onChange={(e) => setGroupSize(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+//               </div>
+//               <div className="col-span-2">
+//                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Seat Tier Level Choice</label>
+//                 <select value={seatType} onChange={(e) => setSeatType(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none">
+//                   <option value={0}>Standard Tier Class</option>
+//                   <option value={1}>Premium Lounger Lounge</option>
+//                   <option value={2}>VIP Balcony Private Box</option>
+//                 </select>
+//               </div>
+//             </div>
+
+//             {/* In-view Audience Output Result Box */}
+//             {audienceResult && (
+//               <div className="bg-emerald-950/30 border border-emerald-900/50 p-4 rounded-xl text-center space-y-1 animate-in fade-in">
+//                 <span className="text-[9px] uppercase font-black tracking-widest text-emerald-400">Optimal Genre Alignment</span>
+//                 <p className="text-xl font-black text-slate-100">{audienceResult} Film Production</p>
+//               </div>
+//             )}
+//           </div>
+
+//           <button type="submit" disabled={loadingAudience} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg disabled:opacity-40 transition-colors mt-4">
+//             {loadingAudience ? "Extracting Analytics..." : "Identify Optimal Target Segment"}
+//           </button>
+//         </form>
+//       </div>
+
+//       {/* REVENUE GRAPHICAL DATA VISUALIZATION OUTPUT SECTION */}
+//       {revenueData.length > 0 && (
+//         <div className="bg-slate-900/30 p-6 border border-slate-800/60 rounded-xl space-y-6 pt-4 animate-in fade-in">
+//           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Model A: Dynamic Revenue Analysis Yield</h3>
+//           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+//             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+//               <div className="h-64 w-full">
+//                 <ResponsiveContainer width="100%" height="100%">
+//                   <BarChart data={revenueData}>
+//                     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.05} />
+//                     <XAxis dataKey="time_label" stroke="#64748b" fontSize={11} />
+//                     <YAxis stroke="#64748b" fontSize={11} />
+//                     <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
+//                     <Bar dataKey="predicted_sales" name="Predicted Total Yield" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+//                   </BarChart>
+//                 </ResponsiveContainer>
+//               </div>
+//             </div>
+//             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+//               <div className="h-64 w-full">
+//                 <ResponsiveContainer width="100%" height="100%">
+//                   <LineChart data={revenueData}>
+//                     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.05} />
+//                     <XAxis dataKey="time_label" stroke="#64748b" fontSize={11} />
+//                     <YAxis stroke="#64748b" fontSize={11} />
+//                     <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
+//                     <Line type="monotone" dataKey="predicted_sales" name="Sales Velocity Trend" stroke="#10b981" strokeWidth={3} />
+//                   </LineChart>
+//                 </ResponsiveContainer>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+
+
+
 "use client";
 
 import { useState } from "react";
 import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  BarChart, Bar, LineChart, Line, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 
 const GENRE_MAPPING = [
-  { name: "Action", encoded: 0 }, { name: "Comedy", encoded: 1 },
-  { name: "Drama", encoded: 2 },  { name: "Horror", encoded: 3 },
+  { name: "Action", encoded: 0 },
+  { name: "Comedy", encoded: 1 },
+  { name: "Drama", encoded: 2 },
+  { name: "Horror", encoded: 3 },
   { name: "Sci-Fi", encoded: 4 }
 ];
 
 const AVAILABLE_TIMES = [
-  { label: "10 AM", value: 10 }, { label: "12 PM", value: 12 },
-  { label: "2 PM", value: 14 },  { label: "4 PM", value: 16 },
-  { label: "6 PM", value: 18 },  { label: "7 PM", value: 19 }
+  { label: "10 AM", value: 10 },
+  { label: "12 PM", value: 12 },
+  { label: "2 PM", value: 14 },
+  { label: "4 PM", value: 16 },
+  { label: "6 PM", value: 18 },
+  { label: "7 PM", value: 19 }
 ];
 
-export default function RevenuePrediction() {
-  // Shared Configuration States
-  const [genreEncoded, setGenreEncoded] = useState(0);
+export default function CinemaDashboard() {
+  // Common Settings
   const [ticketPrice, setTicketPrice] = useState(15);
   const [capacity, setCapacity] = useState(200);
-  
-  // Model A Specific Layout Variables (Revenue Predictions)
-  const [selectedTimes, setSelectedTimes] = useState([]);
+
+  // Model A State Variables (Revenue Model)
+  const [genreEncoded, setGenreEncoded] = useState(0);
+  const [selectedTimes, setSelectedTimes] = useState([10, 14, 18]);
   const [day, setDay] = useState(5);
   const [quarter, setQuarter] = useState(3);
   const [revenueData, setRevenueData] = useState([]);
 
-  // Model B Specific Layout Variables (Target Audience Demographic Mapping)
+  // Model B State Variables (Target Audience Model)
   const [targetAge, setTargetAge] = useState(25);
   const [groupSize, setGroupSize] = useState(1);
-  const [seatType, setSeatType] = useState(1); // Stand-in index representation
+  const [seatType, setSeatType] = useState(1);
   const [audienceResult, setAudienceResult] = useState(null);
 
-  // Global System App states
+  // Model C State Variables (Pre-Release Cinema Potential Model)
+  const [movieTitle, setMovieTitle] = useState("Avatar 3: The Seed Bearer");
+  const [movieGenres, setMovieGenres] = useState("Action|Sci-Fi|Adventure");
+  const [movieBudget, setMovieBudget] = useState(250000000);
+  const [movieRuntime, setMovieRuntime] = useState(160);
+  const [moviePopularity, setMoviePopularity] = useState(85.5);
+  const [releaseYear, setReleaseYear] = useState(2025);
+  const [cinemaTierResult, setCinemaTierResult] = useState(null);
+
+  // Loading & Error Handling States
   const [loadingRevenue, setLoadingRevenue] = useState(false);
   const [loadingAudience, setLoadingAudience] = useState(false);
+  const [loadingCinema, setLoadingCinema] = useState(false);
   const [error, setError] = useState(null);
 
   const handleTimeChange = (timeValue) => {
-    setSelectedTimes(prev => prev.includes(timeValue) ? prev.filter((t) => t !== timeValue) : [...prev, timeValue]);
+    setSelectedTimes(prev =>
+      prev.includes(timeValue) ? prev.filter((t) => t !== timeValue) : [...prev, timeValue]
+    );
   };
 
-  // Pipeline Method A: Fetch Revenue Metrics
+  // 1. Forecast Revenue (Pipeline Engine A)
   const runRevenueForecast = async (e) => {
     e.preventDefault();
     setLoadingRevenue(true);
@@ -407,16 +648,26 @@ export default function RevenuePrediction() {
       const res = await fetch("http://127.0.0.1:8090/predict-revenue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ genre_encoded: genreEncoded, times: selectedTimes, day, ticket_price: ticketPrice, capacity, quarter }),
+        body: JSON.stringify({
+          genre_encoded: genreEncoded,
+          times: selectedTimes,
+          day,
+          ticket_price: ticketPrice,
+          capacity,
+          quarter
+        }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       setRevenueData(result.predictions.sort((a, b) => a.show_time_raw - b.show_time_raw));
-    } catch (err) { setError(err.message); }
-    finally { setLoadingRevenue(false); }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingRevenue(false);
+    }
   };
 
-  // Pipeline Method B: Fetch Demographic Segment Targeting Group Rules
+  // 2. Forecast Target Audience (Pipeline Engine B)
   const runAudienceForecast = async (e) => {
     e.preventDefault();
     setLoadingAudience(true);
@@ -430,38 +681,78 @@ export default function RevenuePrediction() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       setAudienceResult(result.target_audience_genre);
-    } catch (err) { setError(err.message); }
-    finally { setLoadingAudience(false); }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingAudience(false);
+    }
+  };
+
+  // 3. Forecast Cinema Potential Tier (Pipeline Engine C)
+  const runCinemaPotentialForecast = async (e) => {
+    e.preventDefault();
+    setLoadingCinema(true);
+    setError(null);
+    try {
+      const res = await fetch("http://127.0.0.1:8090/predict-cinema-potential", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: movieTitle,
+          genres: movieGenres,
+          budget: movieBudget,
+          runtime: movieRuntime,
+          tmdb_popularity: moviePopularity,
+          release_year: releaseYear
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+      setCinemaTierResult(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingCinema(false);
+    }
   };
 
   return (
     <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-8 max-w-7xl mx-auto text-slate-100 font-sans">
       <div>
-        <h2 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Isolated Multi-Model Forecast Hub</h2>
-        <p className="text-xs text-slate-400">Trigger targeted inference procedures against individual trained machine configurations separately.</p>
+        <h2 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-purple-400">
+          Multi-Model Cinema Analytics Hub
+        </h2>
+        <p className="text-xs text-slate-400 mt-1">
+          Perform targeted predictions using multi-tier Machine Learning pipelines dynamically.
+        </p>
       </div>
 
-      {error && <div className="text-red-400 bg-red-950/30 p-3 rounded-xl border border-red-900/50 text-xs"><strong>Error Framework Signal:</strong> {error}</div>}
+      {error && (
+        <div className="text-red-400 bg-red-950/30 p-3 rounded-xl border border-red-900/50 text-xs">
+          <strong>System Exception Signal:</strong> {error}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* THREE-COLUMN PIPELINE MODEL SECTIONS */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* PANEL 1: REVENUE FLOW CONFIGURATION FORM */}
-        <form onSubmit={runRevenueForecast} className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-xl space-y-4 flex flex-col justify-between">
+        {/* PANEL 1: REVENUE PREDICTION MODEL */}
+        <form onSubmit={runRevenueForecast} className="bg-slate-900/50 border border-slate-800/80 p-5 rounded-xl space-y-4 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="border-b border-slate-800 pb-2">
               <span className="text-[10px] uppercase tracking-widest font-bold text-blue-400">Pipeline Engine A</span>
-              <h3 className="text-sm font-bold text-slate-200">Revenue Volume Estimation Model</h3>
+              <h3 className="text-sm font-bold text-slate-200">Revenue Yield Forecaster</h3>
             </div>
             
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Film Genre Base</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Genre Code</label>
                 <select value={genreEncoded} onChange={(e) => setGenreEncoded(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none">
                   {GENRE_MAPPING.map((g) => <option key={g.encoded} value={g.encoded}>{g.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Ticket Price</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Ticket Price ($)</label>
                 <input type="number" step="0.1" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
               </div>
               <div>
@@ -469,16 +760,16 @@ export default function RevenuePrediction() {
                 <input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Day Vector (0-6)</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Day (0-6)</label>
                 <input type="number" min="0" max="6" value={day} onChange={(e) => setDay(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Select Target Showtimes</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Target Showtimes</label>
               <div className="flex flex-wrap gap-1.5 p-2 border border-slate-800 rounded-lg bg-slate-950">
                 {AVAILABLE_TIMES.map((t) => (
-                  <label key={t.value} className={`px-2.5 py-1 rounded text-[11px] font-medium cursor-pointer transition-all ${selectedTimes.includes(t.value) ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}>
+                  <label key={t.value} className={`px-2 py-1 rounded text-[10px] font-medium cursor-pointer transition-all ${selectedTimes.includes(t.value) ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}>
                     <input type="checkbox" checked={selectedTimes.includes(t.value)} onChange={() => handleTimeChange(t.value)} className="hidden" />
                     {t.label}
                   </label>
@@ -488,56 +779,99 @@ export default function RevenuePrediction() {
           </div>
 
           <button type="submit" disabled={loadingRevenue || selectedTimes.length === 0} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 rounded-lg disabled:opacity-40 transition-colors mt-4">
-            {loadingRevenue ? "Running Revenue Matrix..." : "Calculate Revenue Performance"}
+            {loadingRevenue ? "Computing Yield..." : "Calculate Revenue Matrix"}
           </button>
         </form>
 
-        {/* PANEL 2: AUDIENCE GENRE CLASSIFICATION FORM */}
-        <form onSubmit={runAudienceForecast} className="bg-slate-900/50 border border-slate-800/80 p-6 rounded-xl space-y-4 flex flex-col justify-between">
+        {/* PANEL 2: AUDIENCE GENRE CLASSIFIER */}
+        {/* <form onSubmit={runAudienceForecast} className="bg-slate-900/50 border border-slate-800/80 p-5 rounded-xl space-y-4 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="border-b border-slate-800 pb-2">
               <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-400">Pipeline Engine B</span>
-              <h3 className="text-sm font-bold text-slate-200">Genre Target Audience Forecaster</h3>
+              <h3 className="text-sm font-bold text-slate-200">Demographic Target Forecaster</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Age Group</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Age</label>
                 <input type="number" value={targetAge} onChange={(e) => setTargetAge(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Group Size Array</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Group Size</label>
                 <input type="number" min="1" value={groupSize} onChange={(e) => setGroupSize(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
               </div>
               <div className="col-span-2">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Seat Tier Level Choice</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Seat Tier Class</label>
                 <select value={seatType} onChange={(e) => setSeatType(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none">
-                  <option value={0}>Standard Tier Class</option>
-                  <option value={1}>Premium Lounger Lounge</option>
-                  <option value={2}>VIP Balcony Private Box</option>
+                  <option value={0}>Standard Class Tier</option>
+                  <option value={1}>Premium Recliner Lounge</option>
+                  <option value={2}>VIP Private Box</option>
                 </select>
               </div>
             </div>
 
-            {/* In-view Audience Output Result Box */}
             {audienceResult && (
-              <div className="bg-emerald-950/30 border border-emerald-900/50 p-4 rounded-xl text-center space-y-1 animate-in fade-in">
-                <span className="text-[9px] uppercase font-black tracking-widest text-emerald-400">Optimal Genre Alignment</span>
-                <p className="text-xl font-black text-slate-100">{audienceResult} Film Production</p>
+              <div className="bg-emerald-950/30 border border-emerald-900/50 p-3 rounded-xl text-center space-y-1 animate-in fade-in">
+                <span className="text-[9px] uppercase font-black tracking-widest text-emerald-400">Optimal Genre Segment</span>
+                <p className="text-base font-black text-slate-100">{audienceResult}</p>
               </div>
             )}
           </div>
 
           <button type="submit" disabled={loadingAudience} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg disabled:opacity-40 transition-colors mt-4">
-            {loadingAudience ? "Extracting Analytics..." : "Identify Optimal Target Segment"}
+            {loadingAudience ? "Predicting Segment..." : "Identify Optimal Segment"}
+          </button>
+        </form> */}
+
+        {/* PANEL 3: PRE-RELEASE XGBOOST CINEMA POTENTIAL */}
+        <form onSubmit={runCinemaPotentialForecast} className="bg-slate-900/50 border border-slate-800/80 p-5 rounded-xl space-y-4 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="border-b border-slate-800 pb-2">
+              <span className="text-[10px] uppercase tracking-widest font-bold text-purple-400">Pipeline Engine C (XGBoost)</span>
+              <h3 className="text-sm font-bold text-slate-200">Cinema Potential Tier</h3>
+            </div>
+
+            <div className="space-y-2">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Movie Title</label>
+                <input type="text" value={movieTitle} onChange={(e) => setMovieTitle(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Genres (Piped: Action|Sci-Fi)</label>
+                <input type="text" value={movieGenres} onChange={(e) => setMovieGenres(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Budget ($)</label>
+                  <input type="number" value={movieBudget} onChange={(e) => setMovieBudget(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Runtime (min)</label>
+                  <input type="number" value={movieRuntime} onChange={(e) => setMovieRuntime(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs outline-none" />
+                </div>
+              </div>
+            </div>
+
+            {cinemaTierResult && (
+              <div className="bg-purple-950/30 border border-purple-900/50 p-3 rounded-xl text-center space-y-0.5 animate-in fade-in">
+                <span className="text-[9px] uppercase font-black tracking-widest text-purple-400">Target Potential Tier</span>
+                <p className="text-base font-black text-slate-100">{cinemaTierResult.prediction}</p>
+                <p className="text-[10px] font-semibold text-purple-300">Confidence: {cinemaTierResult.confidence}%</p>
+              </div>
+            )}
+          </div>
+
+          <button type="submit" disabled={loadingCinema} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs py-2.5 rounded-lg disabled:opacity-40 transition-colors mt-4">
+            {loadingCinema ? "Classifying Tier..." : "Evaluate Potential Tier"}
           </button>
         </form>
+
       </div>
 
-      {/* REVENUE GRAPHICAL DATA VISUALIZATION OUTPUT SECTION */}
+      {/* REVENUE VISUALIZATION CHART CONTAINER */}
       {revenueData.length > 0 && (
         <div className="bg-slate-900/30 p-6 border border-slate-800/60 rounded-xl space-y-6 pt-4 animate-in fade-in">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Model A: Dynamic Revenue Analysis Yield</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Model A: Dynamic Sales Output Yield</h3>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
               <div className="h-64 w-full">
@@ -547,11 +881,12 @@ export default function RevenuePrediction() {
                     <XAxis dataKey="time_label" stroke="#64748b" fontSize={11} />
                     <YAxis stroke="#64748b" fontSize={11} />
                     <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                    <Bar dataKey="predicted_sales" name="Predicted Total Yield" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="predicted_sales" name="Predicted Total Yield ($)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
+
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
