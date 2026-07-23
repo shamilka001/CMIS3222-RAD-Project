@@ -12,6 +12,7 @@ import { CinemaMap } from "../components/CinemaMap";
 import LoginPage from "./login/page";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import dynamic from "next/dynamic";
+import { TestimonialsCarousel } from "@/components/ui/testimonials-carousel";
 import { Footer } from "../components/Footer";
 
 // Dynamically import the HeroParallax to avoid SSR issues with GSAP
@@ -401,6 +402,45 @@ function AboutView() {
   const video2Ref = useRef(null);
   const video3Ref = useRef(null);
 
+  // Testimonial data tailored to your cinematic/infrastructure theme
+const cinemaTestimonials = [
+  {
+    text: "The 4K matrix screens at the Moratuwa K-Zone setup are mind-blowing. The visual depth and structural luxury completely redefine the local entertainment experience.",
+    highlight: "redefine the local entertainment experience",
+    image: "/images/users/1.jpg",
+    name: "Priya Kapoor",
+    role: "Production Director",
+  },
+  {
+    text: "Experiencing the 360-degree acoustic setup is surreal. The clean directional sound pressure makes you feel like you are inside the movie.",
+    highlight: "clean directional sound pressure",
+    image: "/images/users/2.jpg",
+    name: "Rohit Verma",
+    role: "Audio Engineer",
+  },
+  {
+    text: "Next-level architecture and hyper-realistic displays. The custom projection mapping spaces bring an unprecedented level of immersion to the audience.",
+    highlight: "unprecedented level of immersion",
+    image: "/images/users/ross.jpg",
+    name: "Roshan Perera",
+    role: "Creative Lead",
+  },
+  {
+    text: "The high-fidelity audio layers provide perfect clarity. You can hear every subtle detail in the room grid, completely isolating you from the outside world.",
+    highlight: "high-fidelity audio layers",
+    image: "/images/users/shami.jpg",
+    name: "Shamilka Peiris",
+    role: "Technical Reviewer",
+  },
+  {
+    text: "The AI analytics insights are invaluable for strategic planning. Forecasting behavior and trends has never been easier.",
+    highlight: "AI analytics insights",
+    image: "/images/users/din.jpg",
+    name: "Dinuja Nimansith",
+    role: "Backend Developer",
+  },
+];
+
   // Synchronize layout element background video instances
   useEffect(() => {
     if (activeVideo === "bg1") {
@@ -701,6 +741,47 @@ function AboutView() {
         </div>
 
       </div>
+
+      {/* SECTION 4: TESTIMONIALS */}
+        <div className="relative py-24 w-full overflow-hidden bg-transparent z-30">
+          
+          {/* Header restricted to container for center alignment */}
+          <div className="container mx-auto px-6 mb-16 relative z-10">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={textFadeVariant}
+              className="text-center"
+            >
+              <span className="text-cyan-500 font-mono tracking-widest font-bold text-xs uppercase block mb-3">
+                // 04 CLIENT REVIEWS
+              </span>
+              <h3 className="text-3xl md:text-5xl font-black text-white uppercase italic">
+                Experience Speaks
+              </h3>
+            </motion.div>
+          </div>
+
+          {/* Carousels broken out of the container for full-width edge-to-edge scroll */}
+          <div className="space-y-6 relative z-10 w-full">
+            <TestimonialsCarousel 
+              cardHeight={220} 
+              direction="left" 
+              speed={35} 
+              testimonials={cinemaTestimonials}
+            />
+            <TestimonialsCarousel 
+              cardHeight={220} 
+              direction="right" 
+              speed={40} 
+              testimonials={cinemaTestimonials}
+            />
+          </div>
+          
+          {/* Subtle gradient overlay to blend into the bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none -z-10" />
+        </div>
 
       {/* Footer Block */}
       <div className="w-full px-6 md:px-10 border-t border-white/10 py-12 relative z-10 bg-black">
